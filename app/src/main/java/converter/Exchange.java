@@ -13,14 +13,21 @@ public class Exchange {
     private HashMap<Currency, HashMap<Currency, Double>> rates;
     private Currency[] popularCurrencies;
 
+    private final int ATTEMPTS; // number of attempts that the user is allowed to enter username
+
     public Exchange() {
         this.users = new ArrayList<User>();
         this.currencies = new ArrayList<Currency>();
         this.rates = new HashMap<Currency, HashMap<Currency, Double>>();
         this.popularCurrencies = new Currency[4];
+        this.ATTEMPTS = 3;
     }
 
-    public User getUser(String username) {
+    public void terminate() {
+        System.out.println("System terminating...");
+    }
+
+    private User validateUser(String username) {
 
         for (int i = 0; i < users.size(); i++) {
 
@@ -32,41 +39,57 @@ public class Exchange {
         return null;
     }
 
+    public User getUser(Scanner input) {
+        String username;
+        User user;
+        int attemptLeft = this.ATTEMPTS;
+
+        System.out.println("Please enter your username:");
+
+        for (int i = 0; i < this.ATTEMPTS; i++) {
+            attemptLeft--;
+
+            username = input.nextLine();
+            user = this.validateUser(username);
+
+            if (user != null) {
+                System.out.println("You are successfully logged in as: " + username);
+                return user;
+            }
+
+            if (attemptLeft != 0) {
+                System.err.println("Wrong username! Please try again.");
+
+                if (attemptLeft > 1) {
+                    System.out.println(String.format("You have %d attempts left.", attemptLeft));
+                }
+                else {
+                    System.out.println(String.format("You have %d attempt left.", attemptLeft));
+                }
+            }
+        }
+
+        System.err.println("You failed too many times!");
+        return null;
+    }
+
     public static void main(String[] args) {
         
         // Welcome message
         Exchange market = new Exchange();
         System.out.println("Welcome to use the currency converter.");
 
-        // Get username from stdin
-        String username;
-        User user;
-        final int ATTEMPTS = 3; // number of attempts that the user is allowed to enter username
-
-        System.out.println("Please enter your username:");
+        // Create scanner from stdin
         Scanner scan = new Scanner(System.in);
 
-        for (int i = 0; i < ATTEMPTS; i++) {
-            username = scan.nextLine();
-            user = market.getUser(username);
+        // Get username from stdin
+        User user = market.getUser(scan);
 
-            if (user != null) {
-                break;
-            }
-
-            if (i == ATTEMPTS - 1 && user == null) {
-                // if it is the last attempt and still no user can be found
-                // print error message and terminate the system
-                System.err.println("You are failing too many times.");
-                System.out.println("System terminating...");
-                return;
-            }
-            else {
-                // if the user does not exist
-                // print the error message and show the number of attempts left
-                System.err.println("Wrong username. Please try again.");
-                System.out.println(String.format("You have %d attempts left.", ATTEMPTS - (i + 1)));
-            }
+        // No user found in the system
+        // terminate the system
+        if (user == null) {
+            market.terminate();
+            return;
         }
     }
 }
