@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
 
 public class Exchange {
     
@@ -27,7 +26,7 @@ public class Exchange {
         System.out.println("System terminating...");
     }
 
-    public User createUser() {         
+    public void createUser() {         
         User user;
         String username;
         int accountType = 0;
@@ -35,7 +34,7 @@ public class Exchange {
         // Get the user type
         accountType = UserInterface.displayMenu("There are two user type available.", 
             new String[]{"Admin", "Normal User"}, 
-            "Please enter the user type most appropriate to you.");
+            "Please enter the user type most appropriate to you:");
         
         // Create relevant user
         switch (accountType) {
@@ -53,10 +52,11 @@ public class Exchange {
         }
         
         // Set username
-        username = UserInterface.getString("Please enter your username.");
+        username = UserInterface.getString("Please enter your username:");
+        System.out.println("Your username is: " + username);
         user.setUsername(username);
 
-        return user;
+        this.users.add(user);
     }
 
     private User validateUser(String username) {
@@ -71,17 +71,15 @@ public class Exchange {
         return null;
     }
 
-    public User getUser(Scanner input) {
+    public User getUser() {
         String username;
         User user;
         int attemptLeft = this.ATTEMPTS;
 
-        System.out.println("Please enter your username:");
-
         for (int i = 0; i < this.ATTEMPTS; i++) {
             attemptLeft--;
 
-            username = input.nextLine();
+            username = UserInterface.getString("Enter your username:");
             user = this.validateUser(username);
 
             if (user != null) {
@@ -106,16 +104,24 @@ public class Exchange {
     }
 
     public static void main(String[] args) {
-        
+     
         // Welcome message
         Exchange market = new Exchange();
         System.out.println("Welcome to use the currency converter.");
 
-        // Create scanner from stdin
-        Scanner scan = new Scanner(System.in);
+        // User login interface
+        int option = UserInterface.displayMenu(
+            "You need to have a user account to use the converter.",
+            new String[]{"Register", "Log in"},
+            "Please enter the index of your option.");
+        
+        if (option == 1) {
+            market.createUser();
+            System.out.println("You are now prompted to log into your account.");
+        }
 
         // Get username from stdin
-        User user = market.getUser(scan);
+        User user = market.getUser();
 
         // No user found in the system
         // terminate the system

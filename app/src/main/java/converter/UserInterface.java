@@ -10,19 +10,18 @@ public class UserInterface {
         Scanner scan = new Scanner(System.in);
 
         do {
+            System.out.println(instruction);
+
             response = scan.nextLine();
             
             // if no response is entered
             if ("".equals(response)) {
                 System.err.println("Blank entry is not allowed.");
                 response = null;
-
-                System.out.println(instruction);
             }
 
         } while (response == null);
 
-        scan.close();
         return response;
     }
 
@@ -51,7 +50,6 @@ public class UserInterface {
         for (int i = 0; i < options.length; i++) {
             System.out.println((i + 1) + ": " + options[i]);
         }
-        System.out.println(instruction);
 
         // Get the response of the selection
         do {
