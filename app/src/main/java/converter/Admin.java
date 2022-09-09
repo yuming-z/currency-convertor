@@ -2,7 +2,7 @@ package converter;
 
 public class Admin extends User {
     
-    public Admin(String username) {
-        super(username);
+    public Admin(Exchange market) {
+        super(market);
     }
 }

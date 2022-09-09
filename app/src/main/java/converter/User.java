@@ -2,9 +2,14 @@ package converter;
 
 public class User {
     
+    protected Exchange market;
     protected String username;
 
-    public User(String username) {
+    public User(Exchange market) {
+        this.market = market;
+    }
+
+    public void setUsername(String username) {
         this.username = username;
     }
 

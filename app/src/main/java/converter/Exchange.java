@@ -27,6 +27,38 @@ public class Exchange {
         System.out.println("System terminating...");
     }
 
+    public User createUser() {         
+        User user;
+        String username;
+        int accountType = 0;
+
+        // Get the user type
+        accountType = UserInterface.displayMenu("There are two user type available.", 
+            new String[]{"Admin", "Normal User"}, 
+            "Please enter the user type most appropriate to you.");
+        
+        // Create relevant user
+        switch (accountType) {
+            case 1:
+                user = new Admin(this);
+                break;
+
+            case 2:
+                user = new User(this);
+                break;
+        
+            default:
+                user = new User(this);
+                break;
+        }
+        
+        // Set username
+        username = UserInterface.getString("Please enter your username.");
+        user.setUsername(username);
+
+        return user;
+    }
+
     private User validateUser(String username) {
 
         for (int i = 0; i < users.size(); i++) {
