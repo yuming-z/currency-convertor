@@ -1,6 +1,6 @@
 package converter;
 
-public class User {
+public abstract class User {
     
     protected Exchange market;
     protected String username;

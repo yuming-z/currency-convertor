@@ -43,11 +43,11 @@ public class Exchange {
                 break;
 
             case 2:
-                user = new User(this);
+                user = new NormalUser(this);
                 break;
         
             default:
-                user = new User(this);
+                user = new NormalUser(this);
                 break;
         }
         
