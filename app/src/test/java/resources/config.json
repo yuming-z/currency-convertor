@@ -4,20 +4,58 @@
       {
       "date": "2020-09-05T19:50:00.000Z",
       "currencies": {
-        "currency": "aus",
-        "gbd": "0.88",
-        "sgd": "0.99",
-        "eud": "0.97",
-        "jy": "95.7",
-        "usd": "0.1678"
-      },
-        "currency": "gbd",
-        "aus": "0.88",
-        "sgd": "0.99",
-        "eud": "0.97",
-        "jy": "95.7",
-        "usd": "0.1678"
-    },
+        "currency": [
+          {
+          "curr" : "aus",
+          "exchanges": {
+            "exchange": [
+              {
+                "exch": "0.88",
+                "country": "sgd"
+              },
+              {
+                "exch": "0.99",
+                "country": "eud"
+              },
+              {
+                "exch": "0.97",
+                "country": "jy"
+              },
+              {
+                "exch": "95.7",
+                "country": "usd"
+              },
+              {
+                "exch": "0.1678",
+                "country": "gbd"
+              }
+            ]
+          },
+         "curr": "sgd",
+         "exchanges": {
+           "exchange": [
+             {
+               "exch": "0.88",
+               "country": "aus"
+             },
+             {
+               "exch": "0.99",
+               "country": "eud"
+             },
+             {
+               "exch": "0.97",
+               "country": "jy"
+             },
+             {
+               "exch": "95.7",
+               "country": "usd"
+             },
+             {
+               "exch": "0.1678",
+               "country": "gbd"
+             }
+           ]
+       },
       {
         "date": "2020-08-05T19:50:00.000Z",
         "rate": {
