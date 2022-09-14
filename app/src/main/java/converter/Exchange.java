@@ -23,6 +23,7 @@ public class Exchange {
     private NormalUser normalUser;
     private AdminUser adminUser;
     private Map<String, String> login = new HashMap<String, String>();
+    private Map<String, HashMap<String, String>> popCurrencies = new HashMap<String, HashMap<String, String>>();
 
 
     public Exchange() {
@@ -69,6 +70,8 @@ public class Exchange {
 
     public  NormalUser getNormalUser(){ return this.normalUser;}
 
+    public  AdminUser getAdminUser(){ return this.adminUser;}
+
 
     public static void main(String[] args){
         Exchange exchange = new Exchange();
@@ -92,9 +95,49 @@ public class Exchange {
                             System.out.println("2:convert currency of amount");
                             System.out.println("3:add currency");
                             System.out.println("4:change rate to latest daily");
-                            System.out.println("4:see statistics");
+                            System.out.println("5:see statistics");
                             String choice = scan.next();
+                            if (choice == "4"){
+                                exchange.getAdminUser().addCurrencyDaily();
+                                exchange.popCurrencies = exchange.getAdminUser().getPopularCurrencies();
+                            }
+                            if (choice == "5"){
+                                JSONParser jsonRead = new JSONParser();
+
+                                FileReader reader = new FileReader("config.json");
+
+                                    //Read JSON file
+                                    Object obj = jsonRead.parse(reader);
+
+                                    JSONObject rates = (JSONObject) obj;
+                                    JSONArray rate = (JSONArray) obj;
+                                    System.out.println("From what date?");
+                                    String dateFrom = scan.next() ;
+                                    System.out.println("To what date?");
+                                    String dateTo = scan.next();
+                                    System.out.println("what is the first currency?");
+                                    String firstCurrency = scan.next() ;
+                                    System.out.println("what is the second currency?");
+                                    String secondCurrency = scan.next() ;
+                                    boolean state = false;
+                                    int num = 0;
+                                    for (Object o : rate){
+                                        state = exchange.getAdminUser().parseRates(o, dateFrom, dateTo);
+                                        if (state == true){
+                                            num = 1;
+                                        }
+                                        else if (state == false && num == 1){
+                                            break;
+                                        }
+                                    }
+                                System.out.println("Here are the statistics");
+                                getAdminUser().calcStatistics(firstCurrency, secondCurrency)
+                                //all conversion rates, average, median, maximum, minimum and standard deviation
+
+
+                            }
                         }
+
                     }
 
                 }
@@ -118,7 +161,11 @@ public class Exchange {
                     }
                 }
             }
-        } catch( Exception e){
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
     }
