@@ -36,23 +36,42 @@ public class AdminUser implements User{
 
     public boolean addCurrencyDaily(){
         Scanner scan = new Scanner(System.in);
+        JSONArray rates = new JSONArray();
+        JSONObject rate = new JSONObject();
+        JSONArray currencies = new JSONArray;
+        JSONObject currency = new JSONObject();
+
+        rates.add(rate);
+        JSONObject date = new JSONObject();
         System.out.println("Whats the date today? in form 00/00/00");
-        String date = scan.nextLine();
-        if (date == this.date){
+        String dateNow = scan.nextLine();
+        if (dateNow == this.date){
             System.out.println("Currencies have already been entered for today");
         }
-        JSONObject rates = new JSONObject();
-        rates.put("date", date);
+        rate.put("date", dateNow);
+        JSONArray exchanges = new JSONArray;
+        JSONObject exchange = new JSONObject();
 
         for(int i = 1;  i <= 6;  i++) {
             System.out.println("" + i + " currency to alter rates of is?(use symbol)");
-            String currency = scan.nextLine();
-            rates.put("currency", currency);
-            System.out.println("First currency and rate exchange (e.g AUS 0.000):");
-            String placeAndrate1 = scan.nextLine();
-            String[] symbolAndrate1 = placeAndrate1.split(" ");
-            rates.put(symbolAndrate1[1], symbolAndrate1[2]);
+            String currentCurr = scan.nextLine();
+            currency.put("curr", currentCurr);
+            this.currency.clear();
+            for (int j = 0;  j <= 5;  j++){
+                System.out.println("exchange rate for currency" + currentCurr + "(e.g 0.000):");
+                String exchRate = scan.nextLine();
+                exchange.put("exch", exchRate);
+                System.out.println("what country? for rate " + exchRate + "(e.g AUS):");
+                String country = scan.nextLine();
+
+                exchange.put("country", country);
+                this.currency.put(currentCurr,null);
+                this.currency.get(currentCurr).put(country,exchRate);
+            }
+
         }
+        currencies.add(currency);
+        rate.put(currencies, currency);
         System.out.println("Limit of currencies have been reached.");
         try (FileWriter file = new FileWriter("config.json")) {
             file.write(rates.toJSONString());
@@ -88,8 +107,8 @@ public class AdminUser implements User{
     }
 
     public boolean parseRates(Object rates, String dateFrom, String dateTo){
-        this.listOfMaps = null;
-        this.chosenExchange = null;
+        this.listOfMaps.clear();
+        this.chosenExchange.clear();
         JSONObject rate = (JSONObject) rates;
         String date = (String) rate.get("date");
 
