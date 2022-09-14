@@ -10,7 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 
-public class AdminUser implements User{
+public class AdminUser implements UserInterface{
 
     private Exchange exchange;
 
@@ -20,6 +20,7 @@ public class AdminUser implements User{
 
 
     private Map<String, HashMap<String, String>> currency = new HashMap<String, HashMap<String, String>>();
+    private Map<String, HashMap<String, String>> popCurrencies = new HashMap<String, HashMap<String, String>>();
 
     private List<HashMap<String,HashMap<String,String>>> listOfMaps = new ArrayList<>();
     private HashMap<String, HashMap<String, String>> chosenExchange = new HashMap<String, HashMap<String, String>>();
@@ -34,25 +35,23 @@ public class AdminUser implements User{
         return true;
     }
 
-    public boolean addCurrencyDaily(){
+    public boolean addCurrencyDaily(String dateNow){
+        this.date = dateNow;
         Scanner scan = new Scanner(System.in);
         JSONArray rates = new JSONArray();
         JSONObject rate = new JSONObject();
-        JSONArray currencies = new JSONArray;
+        JSONArray currencies = new JSONArray();
         JSONObject currency = new JSONObject();
-
         rates.add(rate);
-        JSONObject date = new JSONObject();
-        System.out.println("Whats the date today? in form 00/00/00");
-        String dateNow = scan.nextLine();
-        if (dateNow == this.date){
-            System.out.println("Currencies have already been entered for today");
-        }
         rate.put("date", dateNow);
-        JSONArray exchanges = new JSONArray;
+        JSONArray exchanges = new JSONArray();
         JSONObject exchange = new JSONObject();
+        System.out.println("enter 4 mot popular currencies first then another two currencies");
+        System.out.println("do you want to add currency? (say yes, if you are done say no):");
+        String yesOrno = scan.nextLine();
+        int i = 0;
+        while(yesOrno == "yes") {
 
-        for(int i = 1;  i <= 6;  i++) {
             System.out.println("" + i + " currency to alter rates of is?(use symbol)");
             String currentCurr = scan.nextLine();
             currency.put("curr", currentCurr);
@@ -67,12 +66,19 @@ public class AdminUser implements User{
                 exchange.put("country", country);
                 this.currency.put(currentCurr,null);
                 this.currency.get(currentCurr).put(country,exchRate);
+                if (i <= 4){
+                    this.popCurrencies.put(currentCurr,null);
+                    this.currency.get(currentCurr).put(country,exchRate);
+                    i++;
+                }
             }
+            yesOrno = scan.nextLine();
 
         }
+        rate.put(exchanges, exchange);
         currencies.add(currency);
         rate.put(currencies, currency);
-        System.out.println("Limit of currencies have been reached.");
+
         try (FileWriter file = new FileWriter("config.json")) {
             file.write(rates.toJSONString());
 
@@ -85,24 +91,51 @@ public class AdminUser implements User{
     }
 
     public boolean calcStatistics(String firstCurrency, String secondCurrency){
-        for (HashMap<String,HashMap<String,String>> maps : listOfMaps){
-            if (maps.containsKey(firstCurrency)){
-                ArrayList<Double> exchangeRates1 = new ArrayList<>();
-                for(String value: maps.get(firstCurrency).values()) {
-                    Double rate = Double.parseDouble(value);
+        ArrayList<Double> exchangeRates1 = new ArrayList<>();
+        for (HashMap<String,HashMap<String,String>> maps : listOfMaps) {
+            if (maps.containsKey(firstCurrency)) {
+                if (maps.get(firstCurrency).containsKey(secondCurrency)) {
+                    Double rate = Double.parseDouble(maps.get(firstCurrency).get(secondCurrency));
                     exchangeRates1.add(rate);
                 }
-            if (maps.containsKey(secondCurrency)){
-                ArrayList<Double> exchangeRates2 = new ArrayList<>();
-                for(String value: maps.get(secondCurrency).values()) {
-                    Double rate = Double.parseDouble(value);
-                    exchangeRates2.add(rate);
-                }
-            // dont know what it means when find conversion rates, average, median, maximum, minimum and standard deviation of the conversion rate
-
+            }
 
         }
+        double sum1 = 0.0000000;
+        double sum2 = 0.0000;
+        double max = Double.NEGATIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
+        double median = 0.00000;
+        for (Double r : exchangeRates1){
+            if (r > max) {
+                max = r;
+            }
+            if(r < min) {
+                min = r;
+            }
+            sum1 += r;
+            System.out.println(r);
+        }
+        if(exchangeRates1.size()%2==1)
+        {
+            median =exchangeRates1.get((exchangeRates1.size()+1)/2-1);
+        }
+        else
+        {
+            median =(exchangeRates1.get(exchangeRates1.size()/2-1)+exchangeRates1.get(exchangeRates1.size()/2)/2);
+        }
 
+        double average = sum1/exchangeRates1.size();
+        double standardDeviation = 0.0000;
+        for(double d: exchangeRates1) {
+            standardDeviation += Math.pow(d - average, 2);
+        }
+        standardDeviation =  Math.sqrt(standardDeviation/exchangeRates1.size());
+        System.out.println("The average is "+average+ "");
+        System.out.println("The median is" + median + "");
+        System.out.println("The minimum is" +min+ "");
+        System.out.println("The maximum is " +max+ "");
+        System.out.println("The standard deviation is " +standardDeviation+ "");
         return true;
     }
 
@@ -148,47 +181,13 @@ public class AdminUser implements User{
 
 
 
+
+    }
+    public String getDate(){ return this.date;}
+
+    public Map<String, HashMap<String, String>> getPopularCurrencies(){
+                return this.popCurrencies;
     }
 
 
-
-
-
-    @Override
-    public double convertCurrency(double amount, String currency1, String currency2) {
-        if (currency.containsKey(currency1)) {
-            if (currency.get(currency1).containsKey(currency2)) {
-
-                String rate = currency.get(currency1).get(currency2);
-                double dRate = Double.parseDouble(rate);
-                double newAmount = dRate * amount;
-                return newAmount;
-
-
-            }
-            return -0.00;
-        }
-        return -0.00;
-    }
-
-    @Override
-    public boolean getDisplayTable() {
-        String Row = "";
-        String Column = "";
-        for (String row : this.currency.keySet()) {
-            if (Double.compare(Double.parseDouble(row), Double.valueOf(0.0)) > 0 ){
-                Row += "\n" + row + "(I)";
-            }
-            else {
-                Row += "\n" + row + "(D)";
-            }
-            for (String column : this.currency.get(row).keySet()) {
-                Column += column + "\t";
-                Row += "\t" + this.currency.get(row).get(column);
-            }
-        }
-        System.out.println("\t" + Column + "\n");
-        System.out.println(Row);
-        return true;
-    }
 }
