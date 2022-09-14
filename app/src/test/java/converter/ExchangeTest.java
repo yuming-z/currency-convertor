@@ -43,4 +43,13 @@ class ExchangeTest {
                 "There should be 5 records inside for each currency");
         }
     }
+
+    @Test
+    void testDatabaseLoadNoFile() {
+        Exchange market = new Exchange("src/test/resources/config_nofile.json");
+
+        assertFalse(
+            market.refreshDatabase(),
+            "The database file does not exist");
+    }
 }
