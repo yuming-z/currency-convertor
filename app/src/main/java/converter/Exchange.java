@@ -1,7 +1,6 @@
 package converter;
 
 import java.io.FileReader;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
@@ -111,20 +110,39 @@ public class Exchange {
         return null;
     }
 
+    public List<Currency> getCurrencies() {
+        return this.currencies;
+    }
+
+    public HashMap<Currency, HashMap<Currency, Double>> getRates() {
+        return this.rates;
+    }
+
+    public Currency[] getPopularCurrencies() {
+        return this.popularCurrencies;
+    }
+    
     /**
-     * Read exchange rate from JSON file
-     * @param jsonObject JSON object storing the rates 
-     * @param target the currency to be converted to
+     * Load the latest exchange rates
+     * @param jsonObject the latest exchange rates
      * @param base the currency to be converted from
+     * @return the collection of exchange rates
      */
-    private HashMap<Currency, Double> loadRate(JSONObject jsonObject, Currency target) {
+    private HashMap<Currency, Double> loadRate(JSONObject jsonObject, Currency base) {
 
         HashMap<Currency, Double> rate = new HashMap<Currency, Double>();
 
-        String key = target.toString();
-        double value = Double.parseDouble(jsonObject.get(key).toString());
+        for (Currency target: this.currencies) {
+            if (base.equals(target)) {
+                continue;
+            }
 
-        rate.put(target, value);
+            String key = target.toString();
+            double value = Double.parseDouble(jsonObject.get(key).toString());
+
+            rate.put(target, value);
+        }
+
         return rate;
     }
     
@@ -157,15 +175,9 @@ public class Exchange {
                 JSONArray rates = (JSONArray)currency.get("rates");
                 JSONObject latestRate = (JSONObject)rates.get(rates.size() - 1);
 
-                for (Currency target: this.currencies) {
-                    if (base.equals(target)) {
-                        continue;
-                    }
-
-                    this.rates.put(
-                        base,
-                        loadRate(latestRate, target));
-                }
+                this.rates.put(
+                    base,
+                    this.loadRate(latestRate, base));
             }
 
             reader.close();
