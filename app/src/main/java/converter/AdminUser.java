@@ -86,18 +86,18 @@ public class AdminUser implements User{
 
     public boolean calcStatistics(String firstCurrency, String secondCurrency){
         for (HashMap<String,HashMap<String,String>> maps : listOfMaps){
-            if (maps.containsKey(firstCurrency));
-            ArrayList<Double> exchangeRates1 = new ArrayList<>();
-            for (String currencies : maps.get(firstCurrency)) {
-                Double rate = Double.parseDouble(maps.get(firstCurrency).get(currencies));
-                exchangeRates1.add(rate);
-            }
-            if (maps.containsKey(secondCurrency));
-            ArrayList<Double> exchangeRates2 = new ArrayList<>();
-            for (String currencies : maps.get(secondCurrency)) {
-                Double rate = Double.parseDouble(maps.get(secondCurrency).get(currencies));
-                exchangeRates2.add(rate);
-            }
+            if (maps.containsKey(firstCurrency)){
+                ArrayList<Double> exchangeRates1 = new ArrayList<>();
+                for(String value: maps.get(firstCurrency).values()) {
+                    Double rate = Double.parseDouble(value);
+                    exchangeRates1.add(rate);
+                }
+            if (maps.containsKey(secondCurrency)){
+                ArrayList<Double> exchangeRates2 = new ArrayList<>();
+                for(String value: maps.get(secondCurrency).values()) {
+                    Double rate = Double.parseDouble(value);
+                    exchangeRates2.add(rate);
+                }
             // dont know what it means when find conversion rates, average, median, maximum, minimum and standard deviation of the conversion rate
 
 
