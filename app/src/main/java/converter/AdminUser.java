@@ -22,6 +22,7 @@ public class AdminUser implements User{
     private Map<String, HashMap<String, String>> currency = new HashMap<String, HashMap<String, String>>();
 
     private List<HashMap<String,HashMap<String,String>>> listOfMaps = new ArrayList<>();
+    private HashMap<String, HashMap<String, String>> chosenExchange = new HashMap<String, HashMap<String, String>>();
     //6 currencies
     public AdminUser(Exchange exchange){
         this.exchange = exchange;
@@ -64,10 +65,34 @@ public class AdminUser implements User{
 
     }
 
+    public boolean calcStatistics(String firstCurrency, String secondCurrency){
+        for (HashMap<String,HashMap<String,String>> maps : listOfMaps){
+            if (maps.containsKey(firstCurrency));
+            ArrayList<Double> exchangeRates1 = new ArrayList<>();
+            for (String currencies : maps.get(firstCurrency)) {
+                Double rate = Double.parseDouble(maps.get(firstCurrency).get(currencies));
+                exchangeRates1.add(rate);
+            }
+            if (maps.containsKey(secondCurrency));
+            ArrayList<Double> exchangeRates2 = new ArrayList<>();
+            for (String currencies : maps.get(secondCurrency)) {
+                Double rate = Double.parseDouble(maps.get(secondCurrency).get(currencies));
+                exchangeRates2.add(rate);
+            }
+            // dont know what it means when find conversion rates, average, median, maximum, minimum and standard deviation of the conversion rate
+
+
+        }
+
+        return true;
+    }
+
     public boolean parseRates(Object rates, String dateFrom, String dateTo){
+        this.listOfMaps = null;
+        this.chosenExchange = null;
         JSONObject rate = (JSONObject) rates;
         String date = (String) rate.get("date");
-        HashMap<String, HashMap<String, String>> chosenExchange = new HashMap<String, HashMap<String, String>>();
+
         if (date == dateFrom ){
             this.datePassed = true;
             JSONObject currencies = (JSONObject) rate.get("currencies");
@@ -82,8 +107,8 @@ public class AdminUser implements User{
                     JSONObject object = (JSONObject) obj;
                     String exch  = (String) object.get("exch");
                     String country = (String) object.get("country");
-                    chosenExchange.put(curr, null);
-                    chosenExchange.get(curr).put(country, exch);
+                    this.chosenExchange.put(curr, null);
+                    this.chosenExchange.get(curr).put(country, exch);
 
                 }
 
@@ -94,8 +119,11 @@ public class AdminUser implements User{
 
 
         }
-        if (date == dateTo ){
+        else if (date == dateTo ){
             this.datePassed = false;
+            return false;
+        }
+        else{
             return false;
         }
 
