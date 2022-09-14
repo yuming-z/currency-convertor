@@ -15,7 +15,13 @@ public class AdminUser implements User{
     private Exchange exchange;
 
     private String date;
+
+    private boolean datePassed;
+
+
     private Map<String, HashMap<String, String>> currency = new HashMap<String, HashMap<String, String>>();
+
+    private List<HashMap<String,HashMap<String,String>>> listOfMaps = new ArrayList<>();
     //6 currencies
     public AdminUser(Exchange exchange){
         this.exchange = exchange;
@@ -57,6 +63,47 @@ public class AdminUser implements User{
         return true;
 
     }
+
+    public boolean parseRates(Object rates, String dateFrom, String dateTo){
+        JSONObject rate = (JSONObject) rates;
+        String date = (String) rate.get("date");
+        HashMap<String, HashMap<String, String>> chosenExchange = new HashMap<String, HashMap<String, String>>();
+        if (date == dateFrom ){
+            this.datePassed = true;
+            JSONObject currencies = (JSONObject) rate.get("currencies");
+            JSONArray currency = (JSONArray) currencies.get("currency");
+            for (Object o : currency){
+                JSONObject ob = (JSONObject) o;
+                String curr = (String) ob.get("curr");
+                JSONObject exchanges = (JSONObject) ob.get("exchanges");
+                JSONArray exchange = (JSONArray) exchanges.get("exchange");
+                List<String> exchangeRates = new ArrayList<>();
+                for (Object obj : exchange){
+                    JSONObject object = (JSONObject) obj;
+                    String exch  = (String) object.get("exch");
+                    String country = (String) object.get("country");
+                    chosenExchange.put(curr, null);
+                    chosenExchange.get(curr).put(country, exch);
+
+                }
+
+            }
+            this.listOfMaps.add(chosenExchange);
+            return true;
+
+
+
+        }
+        if (date == dateTo ){
+            this.datePassed = false;
+            return false;
+        }
+
+
+
+    }
+
+
 
 
 
