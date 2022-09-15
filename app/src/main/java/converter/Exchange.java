@@ -39,9 +39,7 @@ public class Exchange {
         int accountType = 0;
 
         // Get the user type
-        accountType = UserInterface.displayMenu("There are two user type available.", 
-            new String[]{"Admin", "Normal User"}, 
-            "Please enter the user type most appropriate to you:");
+        accountType = UserInterface.userTypeMenu();
         
         // Create relevant user
         switch (accountType) {

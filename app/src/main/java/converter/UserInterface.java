@@ -65,4 +65,12 @@ public class UserInterface {
 
         return selection;
     }
+
+    public static int userTypeMenu() {
+
+        return displayMenu(
+            "There are two user types available:",
+            new String[]{"Admin", "Normal User"},
+            "Please enter the user type most appropriate to you:");
+    }
 }
