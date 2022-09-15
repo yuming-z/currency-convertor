@@ -64,7 +64,7 @@ public class UserInterface {
         }
     }
     
-    public static int displayMenu(String description, String[] options, String instruction) {
+    private static int displayMenu(String description, String[] options, String instruction) {
         int selection = 0;
 
         // Display the menu
@@ -86,6 +86,13 @@ public class UserInterface {
         } while (selection == 0);
 
         return selection;
+    }
+
+    public static int loginMenu() {
+        return displayMenu(
+            "You need to have a user account to use the converter.",
+            new String[]{"Register", "Log in"},
+            "Please enter the number of your option:");
     }
 
     public static int userTypeMenu() {

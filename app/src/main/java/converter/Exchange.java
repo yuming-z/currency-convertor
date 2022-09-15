@@ -184,10 +184,7 @@ public class Exchange {
         System.out.println("Welcome to use the currency converter.");
 
         // User login
-        int option = UserInterface.displayMenu(
-            "You need to have a user account to use the converter.",
-            new String[]{"Register", "Log in"},
-            "Please enter the index of your option.");
+        int option = UserInterface.loginMenu();
         
         if (option == 1) {
             // User creation
