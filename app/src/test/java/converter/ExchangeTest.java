@@ -18,6 +18,38 @@ class ExchangeTest {
             market.getATTEMPTS(),
             String.format("There are only %d allowable attempts being set.", ATTEMPTS_ALLOWED));
     }
+
+    @Test
+    void testCreateAdmin() {
+        Exchange market = new Exchange("src/test/resources/sample.json", 3);
+
+        String admin = "admin";
+        market.createUser(1, admin);
+        assertEquals(
+            1,
+            market.getUsers().size(),
+            "There should be a user in the user list");
+        assertEquals(
+            admin,
+            market.getUsers().get(0).getUsername(),
+            "The username of the user should be " + admin);       
+    }
+
+    @Test
+    void testCreateNormalUser() {
+        Exchange market = new Exchange("src/test/resources/sample.json", 3);
+
+        String normalUser = "Normal User";
+        market.createUser(2, normalUser);
+        assertEquals(
+            1,
+            market.getUsers().size(),
+            "There should be a user in the user list");
+        assertEquals(
+            normalUser,
+            market.getUsers().get(0).getUsername(),
+            "The username of the user should be " + normalUser);       
+    }
     
     @Test
     void testDatabaseLoad() {
