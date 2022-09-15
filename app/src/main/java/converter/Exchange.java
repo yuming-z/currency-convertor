@@ -33,13 +33,9 @@ public class Exchange {
         System.out.println("System terminating...");
     }
 
-    public void createUser() {         
+    public void createUser(int accountType) {         
         User user;
         String username;
-        int accountType = 0;
-
-        // Get the user type
-        accountType = UserInterface.userTypeMenu();
         
         // Create relevant user
         switch (accountType) {
@@ -199,7 +195,8 @@ public class Exchange {
             "Please enter the index of your option.");
         
         if (option == 1) {
-            market.createUser();
+            int accountType = UserInterface.userTypeMenu();
+            market.createUser(accountType);
             System.out.println("You are now prompted to log into your account.");
         }
 
