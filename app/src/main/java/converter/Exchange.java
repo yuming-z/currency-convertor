@@ -59,6 +59,10 @@ public class Exchange {
         this.users.add(user);
     }
 
+    public List<User> getUsers() {
+        return users;
+    }
+
     public User getUser(String username) {
 
         for (int i = 0; i < users.size(); i++) {
