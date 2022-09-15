@@ -1,5 +1,7 @@
 package converter;
 
+import java.util.Currency;
+
 public abstract class User {
     
     protected Exchange market;
@@ -12,5 +14,12 @@ public abstract class User {
 
     public String getUsername() {
         return username;
+    }
+
+    public double convert(double amount, Currency to, Currency from) {
+
+        double rate = this.market.getRates().get(to).get(from);
+
+        return amount * rate;
     }
 }
