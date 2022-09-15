@@ -5,11 +5,8 @@ public abstract class User {
     protected Exchange market;
     protected String username;
 
-    public User(Exchange market) {
+    public User(Exchange market, String username) {
         this.market = market;
-    }
-
-    public void setUsername(String username) {
         this.username = username;
     }
 

@@ -33,29 +33,24 @@ public class Exchange {
         System.out.println("System terminating...");
     }
 
-    public void createUser(int accountType) {         
+    public void createUser(int accountType, String username) {
+
         User user;
-        String username;
         
         // Create relevant user
         switch (accountType) {
             case 1:
-                user = new Admin(this);
+                user = new Admin(this, username);
                 break;
 
             case 2:
-                user = new NormalUser(this);
+                user = new NormalUser(this, username);
                 break;
         
             default:
-                user = new NormalUser(this);
+                user = new NormalUser(this, username);
                 break;
         }
-        
-        // Set username
-        username = UserInterface.getString("Please enter your username:");
-        System.out.println("Your username is: " + username);
-        user.setUsername(username);
 
         this.users.add(user);
     }
@@ -188,15 +183,17 @@ public class Exchange {
         Exchange market = new Exchange("src/main/resources/config.json");
         System.out.println("Welcome to use the currency converter.");
 
-        // User login interface
+        // User login
         int option = UserInterface.displayMenu(
             "You need to have a user account to use the converter.",
             new String[]{"Register", "Log in"},
             "Please enter the index of your option.");
         
         if (option == 1) {
+            // User creation
             int accountType = UserInterface.userTypeMenu();
-            market.createUser(accountType);
+            String username = UserInterface.requestUsername();
+            market.createUser(accountType, username);
             System.out.println("You are now prompted to log into your account.");
         }
 

@@ -41,6 +41,28 @@ public class UserInterface {
             System.out.println(instruction);
         }
     }
+
+    public static boolean getBoolean(String instruction) {
+
+        instruction = instruction + " (y/n)";
+
+        String responseString;
+
+        while (true) {
+            
+            responseString = getString(instruction);
+
+            if (responseString.toLowerCase().equals("y")) {
+                return true;
+            }
+            else if (responseString.toLowerCase().equals("n")) {
+                return false;
+            }
+            else {
+                System.err.println("Invalid input - must enter y or n");
+            }
+        }
+    }
     
     public static int displayMenu(String description, String[] options, String instruction) {
         int selection = 0;
@@ -72,5 +94,19 @@ public class UserInterface {
             "There are two user types available:",
             new String[]{"Admin", "Normal User"},
             "Please enter the user type most appropriate to you:");
+    }
+
+    public static String requestUsername() {
+
+        String username;
+
+        do {
+
+            username = getString("Please enter your username:");
+            System.out.println("Your username is: " + username);
+            
+        } while (!getBoolean("Are you satisfied with your username?"));
+        
+        return username;
     }
 }
