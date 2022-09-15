@@ -88,6 +88,10 @@ public class UserInterface {
         return selection;
     }
 
+    public static void welcome() {
+        System.out.println("Welcome to use the currency converter.");
+    }
+
     public static int loginMenu() {
         return displayMenu(
             "You need to have a user account to use the converter.",
@@ -95,15 +99,14 @@ public class UserInterface {
             "Please enter the number of your option:");
     }
 
-    public static int userTypeMenu() {
-
+    private static int userTypeMenu() {
         return displayMenu(
             "There are two user types available:",
             new String[]{"Admin", "Normal User"},
             "Please enter the user type most appropriate to you:");
     }
 
-    public static String requestUsername() {
+    private static String setUsername() {
 
         String username;
 
@@ -115,5 +118,47 @@ public class UserInterface {
         } while (!getBoolean("Are you satisfied with your username?"));
         
         return username;
+    }
+
+    public static void createUser(Exchange market) {
+        
+        int accountType = userTypeMenu();
+        String username = setUsername();
+        market.createUser(accountType, username);
+
+        System.out.println("Back to main menu...");
+    }
+
+    private static String getUsername() {
+        return getString("Enter your username:");
+    }
+
+    public static User getUser(Exchange market) {
+
+        String username;
+        User user;
+        
+        for (int i = market.getATTEMPTS(); i > 0; i--) {
+
+            username = getUsername();
+            user = market.getUser(username);
+
+            if (user != null) {
+                System.out.println("You are successfully logged in as: " + username);
+                return user;
+            }
+
+            System.err.println("Wrong username! Please try again.");
+
+            if (i - 1 != 1) {
+                System.out.println(String.format("You have %d attempts left.", i - 1));
+            }
+            else {
+                System.out.println(String.format("You have %d attempt left.", i - 1));
+            }
+        }
+
+        System.err.println("You failed too many times!");
+        return null;
     }
 }

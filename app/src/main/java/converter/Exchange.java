@@ -20,13 +20,17 @@ public class Exchange {
     private final int ATTEMPTS; // number of attempts that the user is allowed to enter username
     private final String DATABASE_PATH;
 
-    public Exchange(String path) {
+    public Exchange(String path, int allowableAttempts) {
         this.users = new ArrayList<User>();
         this.currencies = new ArrayList<Currency>();
         this.rates = new HashMap<Currency, HashMap<Currency, Double>>();
         this.popularCurrencies = new Currency[4];
-        this.ATTEMPTS = 3;
+        this.ATTEMPTS = allowableAttempts;
         this.DATABASE_PATH = path;
+    }
+
+    public int getATTEMPTS() {
+        return ATTEMPTS;
     }
 
     public void terminate() {
@@ -55,7 +59,7 @@ public class Exchange {
         this.users.add(user);
     }
 
-    private User validateUser(String username) {
+    public User getUser(String username) {
 
         for (int i = 0; i < users.size(); i++) {
 
@@ -64,38 +68,6 @@ public class Exchange {
             }
         }
 
-        return null;
-    }
-
-    public User getUser() {
-        String username;
-        User user;
-        int attemptLeft = this.ATTEMPTS;
-
-        for (int i = 0; i < this.ATTEMPTS; i++) {
-            attemptLeft--;
-
-            username = UserInterface.getString("Enter your username:");
-            user = this.validateUser(username);
-
-            if (user != null) {
-                System.out.println("You are successfully logged in as: " + username);
-                return user;
-            }
-
-            if (attemptLeft != 0) {
-                System.err.println("Wrong username! Please try again.");
-
-                if (attemptLeft > 1) {
-                    System.out.println(String.format("You have %d attempts left.", attemptLeft));
-                }
-                else {
-                    System.out.println(String.format("You have %d attempt left.", attemptLeft));
-                }
-            }
-        }
-
-        System.err.println("You failed too many times!");
         return null;
     }
 
@@ -179,28 +151,28 @@ public class Exchange {
 
     public static void main(String[] args) {
      
+        int option;
+        final int ATTEMPTS_ALLOWED = 3;
+
         // Welcome message
-        Exchange market = new Exchange("src/main/resources/config.json");
-        System.out.println("Welcome to use the currency converter.");
+        Exchange market = new Exchange("src/main/resources/config.json", ATTEMPTS_ALLOWED);
+        UserInterface.welcome();
 
         // User login
-        int option = 0;
-        do {
-
-            option = UserInterface.loginMenu();
+        option = 0;
+        option = UserInterface.loginMenu();
         
-            if (option == 1) {
-                // User creation
-                int accountType = UserInterface.userTypeMenu();
-                String username = UserInterface.requestUsername();
-                market.createUser(accountType, username);
-                System.out.println("Back to main menu...");
-            }
-            
-        } while (option == 1);
+        while (option == 1) {
+
+            // User creation
+            UserInterface.createUser(market);
+
+            option = 0;
+            option = UserInterface.loginMenu();
+        }
 
         // Get username from stdin
-        User user = market.getUser();
+        User user = UserInterface.getUser(market);
 
         // No user found in the system
         // terminate the system
@@ -208,5 +180,7 @@ public class Exchange {
             market.terminate();
             return;
         }
+
+
     }
 }
