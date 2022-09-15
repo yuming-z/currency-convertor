@@ -184,15 +184,20 @@ public class Exchange {
         System.out.println("Welcome to use the currency converter.");
 
         // User login
-        int option = UserInterface.loginMenu();
+        int option = 0;
+        do {
+
+            option = UserInterface.loginMenu();
         
-        if (option == 1) {
-            // User creation
-            int accountType = UserInterface.userTypeMenu();
-            String username = UserInterface.requestUsername();
-            market.createUser(accountType, username);
-            System.out.println("You are now prompted to log into your account.");
-        }
+            if (option == 1) {
+                // User creation
+                int accountType = UserInterface.userTypeMenu();
+                String username = UserInterface.requestUsername();
+                market.createUser(accountType, username);
+                System.out.println("Back to main menu...");
+            }
+            
+        } while (option == 1);
 
         // Get username from stdin
         User user = market.getUser();
