@@ -6,10 +6,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Currency;
 
 class ExchangeTest {
+
+    @Test
+    void testGetAttempts() {
+        final int ATTEMPTS_ALLOWED = 3;
+
+        Exchange market = new Exchange("src/test/resources/sample.json", ATTEMPTS_ALLOWED);
+
+        assertEquals(
+            ATTEMPTS_ALLOWED,
+            market.getATTEMPTS(),
+            String.format("There are only %d allowable attempts being set.", ATTEMPTS_ALLOWED));
+    }
     
     @Test
     void testDatabaseLoad() {
-        Exchange market = new Exchange("src/test/resources/config_correct.json");
+        Exchange market = new Exchange("src/test/resources/config_correct.json", 3);
 
         int numberOfCurrencies = 6;
 
@@ -40,13 +52,13 @@ class ExchangeTest {
             assertEquals(
                 numberOfCurrencies - 1,
                 market.getRates().get(currency).size(),
-                "There should be 5 records inside for each currency");
+                String.format("There should be %d records inside for each currency", numberOfCurrencies - 1));
         }
     }
 
     @Test
     void testDatabaseLoadNoFile() {
-        Exchange market = new Exchange("src/test/resources/config_nofile.json");
+        Exchange market = new Exchange("src/test/resources/config_nofile.json", 3);
 
         assertFalse(
             market.refreshDatabase(),
