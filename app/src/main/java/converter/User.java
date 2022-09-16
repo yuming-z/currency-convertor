@@ -1,5 +1,6 @@
 package converter;
 
+import java.io.InvalidClassException;
 import java.util.Currency;
 
 public abstract class User {
@@ -36,4 +37,6 @@ public abstract class User {
 
         return amount * rate;
     }
+
+    public abstract boolean setPopularCurrencies(Currency currency1, Currency currency2, Currency currency3, Currency currency4) throws InvalidClassException;
 }

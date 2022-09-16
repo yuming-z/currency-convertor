@@ -160,6 +160,10 @@ public class Exchange {
         return false;
     }
 
+    public void setPopularCurrencies(Currency[] popularCurrencies) {
+        this.popularCurrencies = popularCurrencies;
+    }
+
     public static void main(String[] args) {
      
         int option;
