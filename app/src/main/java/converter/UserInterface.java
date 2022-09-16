@@ -65,7 +65,7 @@ public class UserInterface {
 
         return selection;
     }
-
+  
     public static int userTypeMenu() {
 
         return displayMenu(
