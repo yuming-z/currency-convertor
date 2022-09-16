@@ -13,7 +13,9 @@ public class Admin extends User {
     public boolean setPopularCurrencies(Currency currency1, Currency currency2, Currency currency3, Currency currency4)
             throws InvalidClassException {
 
-        this.market.refreshDatabase();
+        if (!this.market.refreshDatabase()) {
+            return false;
+        }
         
         if (!this.market.validateCurrency(currency1)) {
             System.err.println("Currency not supported");
@@ -30,17 +32,21 @@ public class Admin extends User {
             return false;
         }
 
-        if (this.market.validateCurrency(currency4)) {
+        if (!this.market.validateCurrency(currency4)) {
             System.err.println("Currency not suppored");
             return false;
         }
 
-        this.market.setPopularCurrencies(new Currency[]{
+        Currency[] currencies = new Currency[]{
             currency1,
             currency2,
             currency3,
             currency4
-        });
+        };
+
+        for (int i = 0; i < this.market.getPopularCurrencies().length; i++) {
+            this.market.getPopularCurrencies()[i] = currencies[i];
+        }
         return true;
     }
 }
