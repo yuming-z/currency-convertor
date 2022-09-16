@@ -107,6 +107,10 @@ public class UserInterface {
         System.out.println("Welcome to use the currency converter.");
     }
 
+    public static void terminate() {
+        System.out.println("System terminating...");
+    }
+
     public static int loginMenu() {
         return displayMenu(
             "You need to have a user account to use the converter.",

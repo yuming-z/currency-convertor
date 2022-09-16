@@ -33,10 +33,6 @@ public class Exchange {
         return ATTEMPTS;
     }
 
-    public void terminate() {
-        System.out.println("System terminating...");
-    }
-
     public void createUser(int accountType, String username) {
 
         User user;
@@ -192,7 +188,7 @@ public class Exchange {
         // No user found in the system
         // terminate the system
         if (user == null) {
-            market.terminate();
+            UserInterface.terminate();
             return;
         }
     }
