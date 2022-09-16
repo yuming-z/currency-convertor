@@ -122,4 +122,37 @@ class ExchangeTest {
             market.refreshDatabase(),
             "The database file does not exist");
     }
+
+    @Test
+    void testCurrencyValidationNoCurrency() {
+        
+        Currency currency = Currency.getInstance("AUD");
+
+        assertFalse(
+            market.validateCurrency(currency),
+            "There is no currency in the system");
+    }
+
+    @Test
+    void testValidCurrency() {
+
+        // load database
+        market.refreshDatabase();
+
+        Currency currency = Currency.getInstance("AUD");
+
+        assertTrue(
+            market.validateCurrency(currency),
+            String.format("Currency %s exists in the database", currency.toString()));
+    }
+
+    @Test
+    void testInvalidCurrency() {
+
+        // load database
+        Currency currency = Currency.getInstance("NZD");
+
+        assertFalse(
+            market.validateCurrency(currency), "Currency " + currency.toString() + " does not exists in the database");
+    }
 }
