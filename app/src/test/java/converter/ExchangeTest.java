@@ -99,17 +99,17 @@ class ExchangeTest {
         
         // test rates collection
         assertNotNull(
-            market.getRates(),
+            market.getLatestRates(),
             "There should be some contents in the exchange rates collection");
         assertEquals(
             numberOfCurrencies,
-            market.getRates().size(),
+            market.getLatestRates().size(),
             "There should be a total of 6 exchange rates record");
         
-        for (Currency currency: market.getRates().keySet()) {
+        for (Currency currency: market.getLatestRates().keySet()) {
             assertEquals(
                 numberOfCurrencies - 1,
-                market.getRates().get(currency).size(),
+                market.getLatestRates().get(currency).size(),
                 String.format("There should be %d records inside for each currency", numberOfCurrencies - 1));
         }
     }
