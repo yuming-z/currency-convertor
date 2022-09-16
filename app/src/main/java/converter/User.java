@@ -18,6 +18,20 @@ public abstract class User {
 
     public double convert(double amount, Currency to, Currency from) {
 
+        if (!this.market.refreshDatabase()) {
+            return -1;
+        }
+
+        if (amount < 0) {
+            System.err.println("Amount cannot be negative");
+            return -1;
+        }
+
+        if (!(this.market.validateCurrency(from) && this.market.validateCurrency(to))) {
+            System.err.println("Currency is not supported");
+            return -1;
+        }
+
         double rate = this.market.getRates().get(to).get(from);
 
         return amount * rate;

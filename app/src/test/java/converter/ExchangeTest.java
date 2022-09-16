@@ -91,7 +91,7 @@ class ExchangeTest {
         // test currency collection
         assertNotNull(
             market.getCurrencies(),
-            "There should be contents in the currency coolection");
+            "There should be contents in the currency collection");
         assertEquals(
             numberOfCurrencies,
             market.getCurrencies().size(),

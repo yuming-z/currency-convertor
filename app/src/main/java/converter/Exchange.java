@@ -153,6 +153,17 @@ public class Exchange {
         }
     }
 
+    public boolean validateCurrency(Currency currency) {
+        
+        for (int i = 0; i < this.currencies.size(); i++) {
+            if (this.currencies.get(i).equals(currency)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static void main(String[] args) {
      
         int option;
@@ -184,7 +195,5 @@ public class Exchange {
             market.terminate();
             return;
         }
-
-
     }
 }

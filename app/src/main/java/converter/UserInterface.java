@@ -1,10 +1,11 @@
 package converter;
 
+import java.util.Currency;
 import java.util.Scanner;
 
 public class UserInterface {
 
-    public static String getString(String instruction) {
+    private static String getString(String instruction) {
 
         String response;
         Scanner scan = new Scanner(System.in);
@@ -25,7 +26,7 @@ public class UserInterface {
         return response;
     }
 
-    public static int getInt(String instruction) {
+    private static int getInt(String instruction) {
         int response = 0;
 
         while (true) {
@@ -37,12 +38,26 @@ public class UserInterface {
             } catch (NumberFormatException e) {
                 System.err.println("Invalid entry - Number required");
             }
-
-            System.out.println(instruction);
         }
     }
 
-    public static boolean getBoolean(String instruction) {
+    private static double getDouble(String instruction) {
+
+        double response = 0.00;
+
+        while (true) {
+            
+            try {
+                response = Double.parseDouble(getString(instruction));
+                return response;
+
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid input - decimal number required");
+            }
+        }
+    }
+
+    private static boolean getBoolean(String instruction) {
 
         instruction = instruction + " (y/n)";
 
@@ -160,5 +175,48 @@ public class UserInterface {
 
         System.err.println("You failed too many times!");
         return null;
+    }
+
+    public static boolean convert(User user) {
+
+        // Retrieve information from stdin
+        String toCurrencyCode;
+        Currency toCurrency;
+        double amount = 0.00;
+        String fromCurrencyCode;
+        Currency fromCurrency;
+
+        try {
+            // get the currency to be converted to
+            toCurrencyCode = getString(
+                "Enter the currency code of the desired currency you want to convert to:");
+            toCurrency = Currency.getInstance(toCurrencyCode.toUpperCase());
+
+            // get the amount
+            amount = getDouble("Enter the amount:");
+
+            // Get current currency
+            fromCurrencyCode = getString("Enter the currency code of your current currency:");
+            fromCurrency = Currency.getInstance(fromCurrencyCode.toUpperCase());
+            
+        } catch (IllegalArgumentException e) {
+            System.err.println("The currency code you entered is not a valid ISO 4217 currency code.");
+            return false;
+        }
+
+        double result = user.convert(amount, toCurrency, fromCurrency);
+
+        if (result == -1) {
+            return false;
+        }
+        else {
+            System.out.println(
+                String.format("To get %s%.2f you need %s%.2f",
+                toCurrency.getSymbol(),
+                amount,
+                fromCurrency.getSymbol(),
+                result));
+            return true;
+        }
     }
 }
