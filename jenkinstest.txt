@@ -1,2 +1,0 @@
-Sending trigger to Jenkins from GitHub
-Testing a new trigger, hopefully it works this time!!!
