@@ -14,16 +14,19 @@ public class Exchange {
     
     private List<User> users;
     private List<Currency> currencies;
-    private HashMap<Currency, HashMap<Currency, Double>> rates; // always store the latest rate
+    private HashMap<Currency, HashMap<Currency, Double>> latestRates; // always store the latest rate
+    private HashMap<Currency, HashMap<Currency, Double>> previousRates; // the rate of the previous record
     private Currency[] popularCurrencies;
 
     private final int ATTEMPTS; // number of attempts that the user is allowed to enter username
     private final String DATABASE_PATH;
+    private JSONArray database;
 
     public Exchange(String path, int allowableAttempts) {
         this.users = new ArrayList<User>();
         this.currencies = new ArrayList<Currency>();
-        this.rates = new HashMap<Currency, HashMap<Currency, Double>>();
+        this.latestRates = new HashMap<Currency, HashMap<Currency, Double>>();
+        this.previousRates = new HashMap<Currency, HashMap<Currency, Double>>();
         this.popularCurrencies = new Currency[4];
         this.ATTEMPTS = allowableAttempts;
         this.DATABASE_PATH = path;
@@ -75,8 +78,12 @@ public class Exchange {
         return this.currencies;
     }
 
-    public HashMap<Currency, HashMap<Currency, Double>> getRates() {
-        return this.rates;
+    public HashMap<Currency, HashMap<Currency, Double>> getLatestRates() {
+        return latestRates;
+    }
+
+    public HashMap<Currency, HashMap<Currency, Double>> getPreviousRates() {
+        return previousRates;
     }
 
     public Currency[] getPopularCurrencies() {
@@ -84,8 +91,8 @@ public class Exchange {
     }
     
     /**
-     * Load the latest exchange rates
-     * @param jsonObject the latest exchange rates
+     * Load the exchange rates
+     * @param jsonObject the exchange rates
      * @param base the currency to be converted from
      * @return the collection of exchange rates
      */
@@ -113,40 +120,99 @@ public class Exchange {
         return Currency.getInstance(currencyCode);
     }
 
-    public boolean refreshDatabase() {
+    private JSONArray loadDatabase() {
+
         JSONParser parser = new JSONParser();
+        JSONArray database;
 
         try {
             // Read the file
             FileReader reader = new FileReader(this.DATABASE_PATH);
 
-            // convert the JSON file to JSONArray
-            JSONArray database = (JSONArray)parser.parse(reader);
-
-            // load currencies
-            for (int i = 0; i < database.size(); i++) {
-                this.currencies.add(loadCurrency((JSONObject)database.get(i)));
-            }
-
-            // load latest rate
-            for (int i = 0; i < database.size(); i++) {
-                JSONObject currency = (JSONObject)database.get(i);
-                
-                Currency base = loadCurrency(currency);
-                JSONArray rates = (JSONArray)currency.get("rates");
-                JSONObject latestRate = (JSONObject)rates.get(rates.size() - 1);
-
-                this.rates.put(
-                    base,
-                    this.loadRate(latestRate, base));
-            }
+            // Convert the JSON file to JSONArray
+            database = (JSONArray)parser.parse(reader);
 
             reader.close();
-            return true;
+
         } catch (Exception e) {
             System.err.println("The exchange database cannot be loaded.");
+            return null;
+        }
+
+        return database;
+    }
+
+    private JSONObject getCurrencyObject(Currency target) {
+
+        for (int i = 0; i < this.database.size(); i++) {
+            JSONObject currencyObject = (JSONObject)database.get(i);
+
+            Currency currency = this.loadCurrency(currencyObject);
+
+            if (currency.equals(target)) {
+                return currencyObject;
+            }
+        }
+
+        System.err.println(String.format("%s is not supported.", target.toString()));
+        return null;
+    }
+
+    private JSONObject getCurrencyObject(int index) {
+
+        return (JSONObject)this.database.get(index);
+    }
+
+    public JSONArray getHistory(Currency target) {
+
+        JSONObject currencyObj = this.getCurrencyObject(target);
+        if (currencyObj == null) {
+            return null;
+        }
+
+        return (JSONArray)currencyObj.get("rates");
+    }
+
+    private JSONArray getHistory(JSONObject currencyObj) {
+        return (JSONArray)currencyObj.get("rates");
+    }
+
+    public boolean refreshDatabase() {
+
+        this.database = loadDatabase();
+        if (this.database == null) {
             return false;
         }
+
+        // load currencies
+        for (int i = 0; i < database.size(); i++) {
+            this.currencies.add(loadCurrency((JSONObject)database.get(i)));
+        }
+
+        // load rates
+        for (int i = 0; i < database.size(); i++) {
+            JSONObject currency = this.getCurrencyObject(i);
+            
+            Currency base = loadCurrency(currency);
+            JSONArray rates = this.getHistory(currency);
+
+            // load latest rates
+            JSONObject latestRate = (JSONObject)rates.get(rates.size() - 1);
+
+            this.latestRates.put(
+                base,
+                this.loadRate(latestRate, base));
+
+            // load previous rates
+            if (rates.size() > 1) {
+                JSONObject previousRate = (JSONObject)rates.get(rates.size() - 2);
+
+                this.previousRates.put(
+                    base,
+                    this.loadRate(previousRate, base));
+            }
+        }
+        return true;
     }
 
     public boolean validateCurrency(Currency currency) {

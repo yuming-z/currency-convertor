@@ -19,7 +19,7 @@ class NormalUserTest {
         Currency from = Currency.getInstance("CNY");
         
         double result = user.convert(amount, to, from);
-        double expected = amount * market.getRates().get(to).get(from);
+        double expected = amount * market.getLatestRates().get(to).get(from);
         
         assertEquals(
             expected,
