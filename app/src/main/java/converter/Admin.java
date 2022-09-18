@@ -24,10 +24,46 @@ public class Admin extends User {
         List<Double> result = new ArrayList<Double>();
 
         String path = this.market.getJSONPath();
+        int count = 0;
+
+        try {
+            // Write to the file
+            FileWriter writer = new FileWriter(this.DATABASE_PATH);
+
+            JSONArray database = (JSONArray)parser.parse(reader);
+
+            for (int i = 0; i < database.size(); i++) {
+                Currency curr = market.loadCurrency((JSONObject)database.get(i);
+                if (curr == 1){
+                    JSONArray rates = (JSONArray)currency.get("rates");
+                    if (rates.get(0) == d2){
+                        count = 0;
+                    }
+                    if (rates.get(0) == d1) {
+                        count = 1;
+                    }
+                    if (count == 1){
+                        for (JSONObject obj : rates){
+                            String country = (String) obj;
+                            if (country == c2){
+                                result.add(obj.get(i));
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            reader.close();
+            return result;
+        } catch (IOException e) {
+            System.err.println("The database cannot be loaded.");
+            return result;
+        }
+
 
         //Parse the JSON and add all the relevant rates to the list.
 
-        return result;
     }
 
 
