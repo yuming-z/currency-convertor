@@ -1,6 +1,7 @@
 package converter;
 
 import java.io.FileReader;
+import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
@@ -114,7 +115,7 @@ public class Exchange {
         return rate;
     }
     
-    private Currency loadCurrency(JSONObject currency) {
+    public Currency loadCurrency(JSONObject currency) {
 
         String currencyCode = (String)currency.get("currency");
         return Currency.getInstance(currencyCode);
@@ -142,7 +143,7 @@ public class Exchange {
         return database;
     }
 
-    private JSONObject getCurrencyObject(Currency target) {
+    public JSONObject getCurrencyObject(Currency target) {
 
         for (int i = 0; i < this.database.size(); i++) {
             JSONObject currencyObject = (JSONObject)database.get(i);
@@ -173,7 +174,7 @@ public class Exchange {
         return (JSONArray)currencyObj.get("rates");
     }
 
-    private JSONArray getHistory(JSONObject currencyObj) {
+    public JSONArray getHistory(JSONObject currencyObj) {
         return (JSONArray)currencyObj.get("rates");
     }
 
@@ -226,6 +227,14 @@ public class Exchange {
         return false;
     }
 
+    public String getDATABASE_PATH() {
+        return DATABASE_PATH;
+    }
+
+    public JSONArray getDatabase() {
+        return database;
+    }
+
     public static void main(String[] args) {
      
         int option;
@@ -233,6 +242,12 @@ public class Exchange {
 
         // Welcome message
         Exchange market = new Exchange("src/main/resources/config.json", ATTEMPTS_ALLOWED);
+
+        // load database
+        if (!market.refreshDatabase()) {
+            return;
+        }
+
         UserInterface.welcome();
 
         // User login
@@ -256,6 +271,39 @@ public class Exchange {
         if (user == null) {
             UserInterface.terminate();
             return;
+        }
+
+        // main menu
+        while (true) {
+            option = 0;
+            option = UserInterface.mainMenu();
+            switch (option) {
+                case 1:
+                    UserInterface.convert(user);
+                    break;
+
+                case 2:
+                    user.display();
+                    break;
+                
+                case 3:
+                    
+                case 4:
+                    try {
+                        if (!user.updateRates()) {
+                            System.err.println("The update on exchange rates is unfinished.");
+                            System.out.println("Your entries during the process will be discarded.");
+                        }
+                    } catch (InvalidClassException e) {
+                        System.err.println(e.getMessage());
+                        System.out.println("Back to main menu...");
+                    }
+                    break;
+            
+                default:
+                    UserInterface.terminate();
+                    return;
+            }
         }
     }
 }

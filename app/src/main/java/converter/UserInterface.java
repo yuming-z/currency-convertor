@@ -223,4 +223,37 @@ public class UserInterface {
             return true;
         }
     }
+    
+    public static double getNewRate(Currency from, Currency to) {
+
+        double rate = getDouble(String.format(
+            "Please enter the new rate from %s to %s:",
+            from.toString(),
+            to.toString()));
+
+        while (rate < 0) {
+            System.err.println("The new rate cannot be negative.");
+            System.out.println("Please try again.");
+            
+            rate = getDouble(String.format(
+                "Please enter the new rate from %s to %s:",
+                from.toString(),
+                to.toString()));
+        }
+
+        return rate;
+    }
+
+    public static int mainMenu() {
+        return displayMenu(
+            "Main menu",
+            new String[]{
+                "Convert money",
+                "Display excchange rates of most popular currencies",
+                "Maintain popular currencies",
+                "Maintain exchange rates",
+                "Log Out and Exit"
+            },
+            "Please enter the index of your option:");
+    }
 }
