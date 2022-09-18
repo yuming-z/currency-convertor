@@ -17,104 +17,10 @@ public class Admin extends User {
 
     public Admin(Exchange market, String username) {
         super(market, username);
-    }
-
-
-    public List<Double> getEntries(Date d1, Date d2, Currency c1, Currency c2) {
-        List<Double> result = new ArrayList<Double>();
-
-        String path = this.market.getJSONPath();
-
-        //Parse the JSON and add all the relevant rates to the list.
-
-        return result;
-    }
-
-
-    public double getAverage(List<Double> entries) {
-        if (entries.size() == 0) {
-            return -1;
-        }
-
-        double sum = 0.0;
-        for(int i = 0; i < entries.size(); i++) {
-            sum += entries.get(i);
-        }
-
-        double avg = sum / entries.size();
-
-        return avg;
-    }
-
-    public double getMedian(List<Double> entries) {
-        if (entries.size() == 0) {
-            return -1;
-        }
-
-        Collections.sort(entries);
-
-        if ((entries.size() % 2) == 0) {
-            return (entries.get(entries.size() / 2) + entries.get((entries.size() / 2) - 1)) / 2;
-        }
-        else {
-            return entries.get((entries.size() - 1) / 2);
-        }
-    }
-
-    public double getStdDev(List<Double> entries) {
-        return 0.0;
-    }
-
-    public double getMax(List<Double> entries) {
-        if (entries.size() == 0) {
-            return -1;
-        }
-
-        double max = -1;
-
-        for (int i = 0; i < entries.size(); i++) {
-            if (entries.get(i) > max) {
-                max = entries.get(i);
-            }
-        }
-
-        return max;
-    }
-
-    public double getMin(List<Double> entries) {
-        if (entries.size() == 0) {
-            return -1;
-        }
-
-        double min = 1;
-
-        for (int i = 0; i < entries.size(); i++) {
-            if (entries.get(i) < min) {
-                min = entries.get(i);
-            }
-        }
-
-        return min;
-    }
-
-    public HashMap<String, Double> getStats(Date d1, Date d2, Currency c1, Currency c2) {
-        HashMap<String, Double> result = new HashMap<String, Double>();
-
-        List<Double> entries = this.getEntries(d1, d2, c1, c2);
-
-        double avg = getAverage(entries);
-        double med = getMedian(entries);
-        double std = getStdDev(entries);
-        double max = getMax(entries);
-        double min = getMin(entries);
-
-        result.put("average", avg);
-        result.put("median", med);
-        result.put("standard deviation", std);
-        result.put("maximum", max);
-        result.put("minimum", min);
-
-        return result;
+        this.actions = new String[]{"Display most popular currencies",
+                                    "Get currency statistics", 
+                                    "Convert from one currency to another",
+                                    "Add exchange rate information"};
     }
 
     public HashMap<Currency, HashMap<Currency, Double>> addCurrency(HashMap<Currency, HashMap<Currency,Double>> currentRates,
@@ -122,26 +28,16 @@ public class Admin extends User {
                                                                     String currentDate) {
         HashMap<Currency, HashMap<Currency, Double>> result = currentRates;
 
-        result.put(newCurrency, newRates);
-        JSONParser parser = new JSONParser();
+        for (Map.Entry<Currency, HashMap<Currency, Double>> entry : currentRates.entrySet()) {
+            Currency cu = entry.getKey();
+            HashMap<Currency, Double> hm = entry.getValue();
 
-        try {
-            // Write to the file
-            FileWriter writer = new FileWriter(this.DATABASE_PATH);
-            JSONObject currency = new JSONObject();
-            currency.put(newCurrency);
-            JSONObject date = new JSONObject();
-            JSONArray rates = new JSONArray();
-            rates.put(date, currentDate);
-            for (Map.Entry<Currency, Double> set :
-                    newRates.entrySet()) {
-                rates.put(set.getKey(), set.getValue());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            Double reverseRate = 1 / newRates.get(cu);
+            hm.put(newCurrency, reverseRate);
+            result.put(cu, hm);
         }
-
-
+        
+        result.put(newCurrency, newRates);
 
         return result;
     }

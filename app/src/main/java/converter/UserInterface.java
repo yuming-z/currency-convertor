@@ -1,7 +1,6 @@
 package converter;
 
-import java.util.Currency;
-import java.util.Scanner;
+import java.util.*;
 
 public class UserInterface {
 
@@ -43,7 +42,7 @@ public class UserInterface {
         }
     }
 
-    private static double getDouble(String instruction) {
+    public static double getDouble(String instruction) {
 
         double response = 0.00;
 
@@ -117,6 +116,13 @@ public class UserInterface {
         return displayMenu(
             "You need to have a user account to use the converter.",
             new String[]{"Register", "Log in"},
+            "Please enter the number of your option:");
+    }
+
+    public static int userDo(String[] actions) {
+        return displayMenu(
+            "Welcome!",
+            actions,
             "Please enter the number of your option:");
     }
 

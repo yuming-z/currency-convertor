@@ -1,11 +1,14 @@
 package converter;
 
-import java.util.Currency;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public abstract class User {
     
     protected Exchange market;
     protected String username;
+    protected String[] actions;
 
     public User(Exchange market, String username) {
         this.market = market;
@@ -35,5 +38,156 @@ public abstract class User {
         double rate = this.market.getRates().get(to).get(from);
 
         return amount * rate;
+    }
+
+    public List<Double> getEntries(Date d1, Date d2, Currency c1, Currency c2) {
+        List<Double> result = new ArrayList<Double>();
+
+        String path = this.market.getJSONPath();
+
+        //Parse the JSON and add all the relevant rates to the list.
+
+        return result;
+    }
+
+
+    public double getAverage(List<Double> entries) {
+        if (entries.size() == 0) {
+            return -1;
+        }
+
+        double sum = 0.0;
+        for(int i = 0; i < entries.size(); i++) {
+            sum += entries.get(i);
+        }
+
+        double avg = sum / entries.size();
+
+        return avg;
+    }
+
+    public double getMedian(List<Double> entries) {
+        if (entries.size() == 0) {
+            return -1;
+        }
+
+        Collections.sort(entries);
+
+        if ((entries.size() % 2) == 0) {
+            return (entries.get(entries.size() / 2) + entries.get((entries.size() / 2) - 1)) / 2;
+        }
+        else {
+            return entries.get((entries.size() - 1) / 2);
+        }
+    }
+
+    public double getStdDev(List<Double> entries) {
+        return 0.0;
+    }
+
+    public double getMax(List<Double> entries) {
+        if (entries.size() == 0) {
+            return -1;
+        }
+
+        double max = -1;
+
+        for (int i = 0; i < entries.size(); i++) {
+            if (entries.get(i) > max) {
+                max = entries.get(i);
+            }
+        }
+
+        return max;
+    }
+
+    public double getMin(List<Double> entries) {
+        if (entries.size() == 0) {
+            return -1;
+        }
+
+        double min = 1;
+
+        for (int i = 0; i < entries.size(); i++) {
+            if (entries.get(i) < min) {
+                min = entries.get(i);
+            }
+        }
+
+        return min;
+    }
+
+    public HashMap<String, Double> getStats(Date d1, Date d2, Currency c1, Currency c2) {
+        HashMap<String, Double> result = new HashMap<String, Double>();
+
+        List<Double> entries = this.getEntries(d1, d2, c1, c2);
+
+        double avg = getAverage(entries);
+        double med = getMedian(entries);
+        double std = getStdDev(entries);
+        double max = getMax(entries);
+        double min = getMin(entries);
+
+        result.put("average", avg);
+        result.put("median", med);
+        result.put("standard deviation", std);
+        result.put("maximum", max);
+        result.put("minimum", min);
+
+        return result;
+    }
+
+    public boolean action(int id) {
+        Scanner scan = new Scanner(System.in);
+        
+        if (id == 1) {
+            //display most popular currencies
+        }
+        else if (id == 2) {
+            try {
+                System.out.print("Enter first date dd/mm/yyyy: ");
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/mm/yyyy");
+                Date d1 = formatter.parse(scan.nextLine());
+
+                System.out.print("Enter second date dd/mm/yyyy: ");
+                Date d2 = formatter.parse(scan.nextLine());
+
+                System.out.print("Enter first currency: ");
+                Currency c1 = Currency.getInstance(scan.nextLine());
+
+                System.out.print("Enter second currency: ");
+                Currency c2 = Currency.getInstance(scan.nextLine());
+
+                HashMap<String, Double> stats = getStats(d1, d2, c1, c2);
+                for (Map.Entry<String, Double> entry : stats.entrySet()) {
+                    System.out.println(entry.getKey() + ": " + entry.getValue().toString());
+                }
+            }
+            catch (ParseException e) {
+                System.out.println("Error while parsing input!");
+            }
+            
+        }
+        else if (id == 3) {
+            System.out.print("Enter first currency: ");
+            Currency c1 = Currency.getInstance(scan.nextLine());
+
+            System.out.print("Enter second currency: ");
+            Currency c2 = Currency.getInstance(scan.nextLine());
+
+            System.out.print("Enter amount of first currency to convert to second currency: ");
+            Double amount = UserInterface.getDouble(scan.nextLine());
+
+            Double result = this.convert(amount, c1, c2);
+
+            System.out.println("Result: " + result.toString());
+        }
+        else if (id == 4) {
+            //add currency
+        }
+
+        scan.close();
+
+        return true;
     }
 }

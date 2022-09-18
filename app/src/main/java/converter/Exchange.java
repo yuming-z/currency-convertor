@@ -195,5 +195,15 @@ public class Exchange {
             UserInterface.terminate();
             return;
         }
+
+        while(true) {
+            option = 0;
+            option = UserInterface.userDo(user.actions);
+
+            boolean success = user.action(option);
+            if (!success) {
+                break;
+            }
+        }
     }
 }
