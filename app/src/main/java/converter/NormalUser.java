@@ -10,7 +10,7 @@ public class NormalUser extends User {
     }
 
     @Override
-    public boolean setPopularCurrencies(Currency currency1, Currency currency2, Currency currency3, Currency currency4)
+    public boolean setPopularCurrencies(Currency[] currencies)
             throws InvalidClassException {
         throw new InvalidClassException("Unauthorised");
     }

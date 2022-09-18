@@ -39,7 +39,7 @@ public abstract class User {
         return amount * rate;
     }
 
-    public abstract boolean setPopularCurrencies(Currency currency1, Currency currency2, Currency currency3, Currency currency4) throws InvalidClassException;
+    public abstract boolean setPopularCurrencies(Currency[] currencies) throws InvalidClassException;
 
     private double[][] getPopularRates(HashMap<Currency, HashMap<Currency, Double>> rates) {
 

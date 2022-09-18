@@ -16,39 +16,23 @@ public class Admin extends User {
     }
 
     @Override
-    public boolean setPopularCurrencies(Currency currency1, Currency currency2, Currency currency3, Currency currency4)
+    public boolean setPopularCurrencies(Currency[] currencies)
             throws InvalidClassException {
 
         if (!this.market.refreshDatabase()) {
             return false;
         }
         
-        if (!this.market.validateCurrency(currency1)) {
-            System.err.println("Currency not supported");
-            return false;
-        }
+        for (int i = 0; i < currencies.length; i++) {
+            if (!this.market.validateCurrency(currencies[i])) {
+                System.err.println(
+                    String.format("%s is not supported.",
+                    currencies[i].toString())
+                );
 
-        if (!this.market.validateCurrency(currency2)) {
-            System.err.println("Currency not supported");
-            return false;
+                return false;
+            }
         }
-
-        if (!this.market.validateCurrency(currency3)) {
-            System.err.println("Currency not supported");
-            return false;
-        }
-
-        if (!this.market.validateCurrency(currency4)) {
-            System.err.println("Currency not suppored");
-            return false;
-        }
-
-        Currency[] currencies = new Currency[]{
-            currency1,
-            currency2,
-            currency3,
-            currency4
-        };
 
         for (int i = 0; i < this.market.getPopularCurrencies().length; i++) {
             this.market.getPopularCurrencies()[i] = currencies[i];

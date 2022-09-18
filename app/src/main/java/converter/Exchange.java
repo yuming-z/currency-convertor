@@ -286,7 +286,11 @@ public class Exchange {
                     break;
                 
                 case 3:
-                    
+                    if (!UserInterface.setPopularCurrencies(user)) {
+                        System.out.println("Back to main menu...");
+                    }
+                    break;
+
                 case 4:
                     if (!UserInterface.updateRates(user)) {
                         System.out.println("Back to main menu...");
