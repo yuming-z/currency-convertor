@@ -12,16 +12,19 @@ package converter;
 import java.util.*;
 
 public class Admin extends User {
-    
+
+    private String DATABASE_PATH;
+
     public Admin(Exchange market, String username) {
         super(market, username);
     }
+
 
     public List<Double> getEntries(Date d1, Date d2, Currency c1, Currency c2) {
         List<Double> result = new ArrayList<Double>();
 
         String path = this.market.getJSONPath();
-        
+
         //Parse the JSON and add all the relevant rates to the list.
 
         return result;
@@ -32,14 +35,14 @@ public class Admin extends User {
         if (entries.size() == 0) {
             return -1;
         }
-        
+
         double sum = 0.0;
         for(int i = 0; i < entries.size(); i++) {
             sum += entries.get(i);
         }
 
         double avg = sum / entries.size();
-        
+
         return avg;
     }
 
@@ -47,7 +50,7 @@ public class Admin extends User {
         if (entries.size() == 0) {
             return -1;
         }
-        
+
         Collections.sort(entries);
 
         if ((entries.size() % 2) == 0) {
@@ -74,7 +77,7 @@ public class Admin extends User {
                 max = entries.get(i);
             }
         }
-        
+
         return max;
     }
 
@@ -90,7 +93,7 @@ public class Admin extends User {
                 min = entries.get(i);
             }
         }
-        
+
         return min;
     }
 
@@ -114,14 +117,31 @@ public class Admin extends User {
         return result;
     }
 
-    public HashMap<Currency, HashMap<Currency, Double>> addCurrency(HashMap<Currency, HashMap<Currency,Double>> currentRates, Currency newCurrency, HashMap<Currency,Double> newRates) {
+    public HashMap<Currency, HashMap<Currency, Double>> addCurrency(HashMap<Currency, HashMap<Currency,Double>> currentRates,
+                                                                    Currency newCurrency, HashMap<Currency,Double> newRates,
+                                                                    String currentDate) {
         HashMap<Currency, HashMap<Currency, Double>> result = currentRates;
 
         result.put(newCurrency, newRates);
-        
-        //modify existing entries
+        JSONParser parser = new JSONParser();
 
-        
+        try {
+            // Write to the file
+            FileWriter writer = new FileWriter(this.DATABASE_PATH);
+            JSONObject currency = new JSONObject();
+            currency.put(newCurrency);
+            JSONObject date = new JSONObject();
+            JSONArray rates = new JSONArray();
+            rates.put(date, currentDate);
+            for (Map.Entry<Currency, Double> set :
+                    newRates.entrySet()) {
+                rates.put(set.getKey(), set.getValue());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
 
         return result;
     }
