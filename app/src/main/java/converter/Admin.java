@@ -1,14 +1,14 @@
 package converter;
 
-//import org.json.simple.JSONArray;
-//import org.json.simple.JSONObject;
-//import org.json.simple.parser.JSONParser;
-//import org.json.simple.parser.ParseException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-//import java.io.FileNotFoundException;
-//import java.io.FileReader;
-//import java.io.FileWriter;
-//import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class Admin extends User {
@@ -19,8 +19,15 @@ public class Admin extends User {
         super(market, username);
     }
 
+    public Currency loadCurrency(JSONObject currency) {
+
+        String currencyCode = (String)currency.get("currency");
+        return Currency.getInstance(currencyCode);
+    }
+
 
     public List<Double> getEntries(Date d1, Date d2, Currency c1, Currency c2) {
+        JSONParser parser = new JSONParser();
         List<Double> result = new ArrayList<Double>();
 
         String path = this.market.getJSONPath();
@@ -28,14 +35,14 @@ public class Admin extends User {
 
         try {
             // Write to the file
-            FileWriter writer = new FileWriter(this.DATABASE_PATH);
+            FileReader reader = new FileReader(this.DATABASE_PATH);
 
             JSONArray database = (JSONArray)parser.parse(reader);
 
             for (int i = 0; i < database.size(); i++) {
-                Currency curr = market.loadCurrency((JSONObject)database.get(i);
-                if (curr == 1){
-                    JSONArray rates = (JSONArray)currency.get("rates");
+                Currency curr = this.loadCurrency((JSONObject)database.get(i));
+                if (curr == c1){
+                    JSONArray rates = (JSONArray)curr.get("rates");
                     if (rates.get(0) == d2){
                         count = 0;
                     }
@@ -43,10 +50,11 @@ public class Admin extends User {
                         count = 1;
                     }
                     if (count == 1){
-                        for (JSONObject obj : rates){
+                        for (Object obj : rates){
+                            JSONObject o = (JSONObject) obj;
                             String country = (String) obj;
-                            if (country == c2){
-                                result.add(obj.get(i));
+                            if (Currency.getInstance(country) == c2){
+                                result.add(o.get(i));
                             }
                         }
                     }
@@ -161,21 +169,34 @@ public class Admin extends User {
         result.put(newCurrency, newRates);
         JSONParser parser = new JSONParser();
 
-        try {
+
             // Write to the file
-            FileWriter writer = new FileWriter(this.DATABASE_PATH);
-            JSONObject currency = new JSONObject();
-            currency.put(newCurrency);
-            JSONObject date = new JSONObject();
-            JSONArray rates = new JSONArray();
-            rates.put(date, currentDate);
-            for (Map.Entry<Currency, Double> set :
-                    newRates.entrySet()) {
-                rates.put(set.getKey(), set.getValue());
-            }
+        JSONArray database = new JSONArray();
+        JSONObject obj = new JSONObject();
+        databse.add(obj)
+        obj.put("currency", newCurrency);
+        JSONObject date = new JSONObject();
+        JSONArray rates = new JSONArray();
+        JSONObject rate = new JSONObject();
+        rates.add(rate);
+        obj.put("rates",rates)
+        rate.put(date, currentDate);
+        for (Map.Entry<Currency, Double> set :
+                newRates.entrySet()) {
+            rate.put(set.getKey().toString(), set.getValue());
+        }
+       try (PrintWriter writer = new PrintWriter(new FileWriter((this.DATABASE_PATH))) {
+                writer.write(databse.toString());
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        } finally {
+            try {
+                file.close();
+            } catch (IOException e) {
+
+                e.printStackTrace();
+            }
+    }
 
 
 
