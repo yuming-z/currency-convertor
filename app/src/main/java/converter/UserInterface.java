@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 public class UserInterface {
 
+    @SuppressWarnings("all")
     private static String getString(String instruction) {
 
         String response;
