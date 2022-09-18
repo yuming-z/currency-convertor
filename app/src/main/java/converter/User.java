@@ -134,4 +134,6 @@ public abstract class User {
         this.displayPopularRates(latestRates, previousRates);
         return true;
     }
+
+    public abstract boolean updateRates() throws InvalidClassException;
 }
