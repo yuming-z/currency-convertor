@@ -29,7 +29,7 @@ Then select your user type from Admin or Normal User and input your username. Th
 If you are a normal user, you can get the table of the popular currencies and the exchange rates between them, then you will be asked to input the code of the currency you want to convert to, the amount of that, and the code of the currency you want to convert from. 
 
 If you are an admin user, besides the above operations, you can update the exchange rate daily of existing currencies and add currency types and its rate.
-## How to Test
+# How to Test
 We utilise JUnit to test. We create a test file for each class except the UserInterface class. 
 
 Firstly, ```import static org.junit.jupiter.api.Assertions.assertEquals```and ```import org.junit.jupiter.api.Test``` to import the libraries needed for JUnit testing in the test files. 
@@ -51,6 +51,7 @@ Before starting to work on something, please open an issue and discuss it with t
 * Gradle version 7.4 or higher
 * A text editor or IDE. We recommend IntelliJ and VSCode. 
 * git and a GitHub account within the University of Sydney Enterprise, SOFT2412/COMP9412 2022 Organization.
+
 ## Making your change
 1. Clone the repository to your local machine.
 2. Create your own branch. Do not make changes in the master branch at the beginning.
@@ -60,4 +61,3 @@ Before starting to work on something, please open an issue and discuss it with t
 1. Commit the code changes to your branch with a specific commit message.
 2. Open a pull request.
 3. Respond to the review messages given by the team members and make corresponding code changes.
-
