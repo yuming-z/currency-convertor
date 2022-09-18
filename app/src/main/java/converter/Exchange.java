@@ -33,6 +33,10 @@ public class Exchange {
         return ATTEMPTS;
     }
 
+    public String getJSONPath() {
+        return this.DATABASE_PATH;
+    }
+
     public void createUser(int accountType, String username) {
 
         User user;

@@ -23,6 +23,8 @@ public class UserInterface {
 
         } while (response == null);
 
+        scan.close();
+
         return response;
     }
 
