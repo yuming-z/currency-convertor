@@ -1,5 +1,6 @@
 package converter;
 
+import java.io.InvalidClassException;
 import java.util.Currency;
 import java.util.Scanner;
 
@@ -243,6 +244,24 @@ public class UserInterface {
         }
 
         return rate;
+    }
+
+    public static boolean updateRates(User user) {
+        
+        try {
+            if (!user.updateRates()) {
+                System.err.println(
+                    "The update on exchange rates is unfinished.");
+                System.out.println(
+                    "Your entries during the process will be discarded.");
+                return false;
+            }
+        } catch (InvalidClassException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
     public static int mainMenu() {

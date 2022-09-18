@@ -1,7 +1,6 @@
 package converter;
 
 import java.io.FileReader;
-import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
@@ -289,13 +288,7 @@ public class Exchange {
                 case 3:
                     
                 case 4:
-                    try {
-                        if (!user.updateRates()) {
-                            System.err.println("The update on exchange rates is unfinished.");
-                            System.out.println("Your entries during the process will be discarded.");
-                        }
-                    } catch (InvalidClassException e) {
-                        System.err.println(e.getMessage());
+                    if (!UserInterface.updateRates(user)) {
                         System.out.println("Back to main menu...");
                     }
                     break;
