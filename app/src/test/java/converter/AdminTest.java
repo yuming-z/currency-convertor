@@ -65,6 +65,30 @@ class AdminTest {
         )
     }
 
+    @Test
+    void testGetEntries() {
+        ArrayList<Double> testEntries = new ArrayList<>();
+        testEntries.add(0.94777517);
+        double result = user.getEntries("AUD", "SGD", "2022-09-14T10:53:00.000Z", "2022-09-14T13:08:00.000Z");
+        double expected = testEntries;
+        assertEquals(
+                expected,
+                result,
+                "The entries result is wrong. Expected: " + expected);
+        )
+    }
+
+    @Test
+    void testGetEntries() {
+        ArrayList<Double> testEntries = new ArrayList<>();
+        double result = user.getEntries("JY", "FR", "2022-09-14T10:53:00.000Z", "2022-09-14T13:08:00.000Z");
+        double expected = testEntries;
+        assertEquals(
+                expected,
+                result,
+                "The entries result is wrong. Expected: " + expected);
+        )
+    }
 
     @Test
     void testGetAverage() {

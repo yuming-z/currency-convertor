@@ -1,6 +1,16 @@
 package converter;
 
-import java.text.ParseException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -41,13 +51,54 @@ public abstract class User {
     }
 
     public List<Double> getEntries(Date d1, Date d2, Currency c1, Currency c2) {
+        JSONParser parser = new JSONParser();
         List<Double> result = new ArrayList<Double>();
 
         String path = this.market.getJSONPath();
+        int count = 0;
+
+        try {
+            // Write to the file
+            FileReader reader = new FileReader(this.DATABASE_PATH);
+
+            JSONArray database = (JSONArray)parser.parse(reader);
+
+            for (int i = 0; i < database.size(); i++) {
+                JSONObject curr = (JSONObject)database.get(i);
+                String strCurrency  = (String)curr;
+                if (Currency.getInstance(strCurrency) == c1){
+                    JSONArray rates = (JSONArray)curr.get("rates");
+                    if (rates.get(0) == d2){
+                        count = 0;
+                    }
+                    if (rates.get(0) == d1) {
+                        count = 1;
+                    }
+                    if (count == 1){
+                        for (int i = 1; i < rates.size(); i++){
+                            JSONObject o = (JSONObject) obj;
+                            String country = (String) obj;
+                            if (Currency.getInstance(country) == c2){
+                                String str = (String)o.get(i);
+                                Double exchRate = Double.parseDouble(str);
+                                result.add(exchRate);
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            reader.close();
+            return result;
+        } catch (IOException e) {
+            System.err.println("The database cannot be loaded.");
+            return result;
+        }
+
 
         //Parse the JSON and add all the relevant rates to the list.
 
-        return result;
     }
 
 
