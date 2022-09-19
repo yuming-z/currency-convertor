@@ -299,6 +299,12 @@ public class Exchange {
                         System.out.println("Back to main menu...");
                     }
                     break;
+
+                case 5:
+                    if (!UserInterface.getSummary(user)) {
+                        System.out.println("Back to main menu...");
+                    }
+                    break;
             
                 default:
                     UserInterface.terminate();
