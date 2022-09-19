@@ -25,10 +25,6 @@ public class Admin extends User {
         
         for (int i = 0; i < currencies.length; i++) {
             if (!this.market.validateCurrency(currencies[i])) {
-                System.err.println(
-                    String.format("%s is not supported.",
-                    currencies[i].toString())
-                );
 
                 return false;
             }

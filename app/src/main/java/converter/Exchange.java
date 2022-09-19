@@ -223,6 +223,9 @@ public class Exchange {
             }
         }
 
+        System.err.println(
+            String.format("%s is not supported.",
+            currency.toString()));
         return false;
     }
 

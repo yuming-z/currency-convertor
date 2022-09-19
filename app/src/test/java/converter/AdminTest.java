@@ -3,12 +3,13 @@ package converter;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.InvalidClassException;
 import java.util.Currency;
 
 class AdminTest {
     
-    String path = "src/test/resources/config_correct.json";
-    Exchange market = new Exchange(path, 0);
+    static final String PATH = "src/test/resources/config_correct.json";
+    Exchange market = new Exchange(PATH, 0);
     User user = new Admin(market, "test user");
 
     @Test
@@ -75,5 +76,111 @@ class AdminTest {
             -1,
             result,
             "The conversion should fail: Invalid FROM and TO currency");
+    }
+
+    @Test
+    void testSetPopularCurrencies() {
+
+        Currency[] currencies = new Currency[]{
+            Currency.getInstance("AUD"),
+            Currency.getInstance("SGD"),
+            Currency.getInstance("USD"),
+            Currency.getInstance("EUR")
+        };
+
+        boolean status = false;
+
+        try {
+            status = user.setPopularCurrencies(currencies);
+
+        } catch (InvalidClassException e) {
+            e.printStackTrace();
+        }
+
+        assertTrue(status,
+        "The popular currencies setting process should be successful.");
+        
+        for (int i = 0; i < market.getPopularCurrencies().length; i++) {
+
+            assertEquals(
+                currencies[i],
+                market.getPopularCurrencies()[i],
+                String.format(
+                    "The popular currencies list should include %s",
+                    currencies[i].toString()
+                )
+            );
+        }
+    }
+
+    @Test
+    void testUnsupportedPopularCurrencies() {
+
+        // One unsupported currency
+        Currency[] currencies = new Currency[]{
+            Currency.getInstance("AUD"),
+            Currency.getInstance("SGD"),
+            Currency.getInstance("USD"),
+            Currency.getInstance("NZD")
+        };
+
+        boolean status = false;
+
+        try {
+            status = user.setPopularCurrencies(currencies);
+
+        } catch (InvalidClassException e) {
+            e.printStackTrace();
+        }
+
+        assertFalse(status, "There is 1 currency not supported");
+
+        // 2 unsupported currencies
+        currencies = new Currency[]{
+            Currency.getInstance("AUD"),
+            Currency.getInstance("USD"),
+            Currency.getInstance("NZD"),
+            Currency.getInstance("JPY")
+        };
+
+        try {
+            status = user.setPopularCurrencies(currencies);
+        } catch (InvalidClassException e) {
+            e.printStackTrace();
+        }
+
+        assertFalse(status, "There are 2 unsupported currencies");
+
+        // 3 unsupported currencies
+        currencies = new Currency[]{
+            Currency.getInstance("AUD"),
+            Currency.getInstance("NZD"),
+            Currency.getInstance("JPY"),
+            Currency.getInstance("KRW")
+        };
+
+        try {
+            status = user.setPopularCurrencies(currencies);
+        } catch (InvalidClassException e) {
+            e.printStackTrace();
+        }
+
+        assertFalse(status, "There are 3 unsupported currencies");
+
+        // 4 unsupported currencies
+        currencies = new Currency[]{
+            Currency.getInstance("CAD"),
+            Currency.getInstance("NZD"),
+            Currency.getInstance("JPY"),
+            Currency.getInstance("KRW")
+        };
+
+        try {
+            status = user.setPopularCurrencies(currencies);
+        } catch (InvalidClassException e) {
+            e.printStackTrace();
+        }
+
+        assertFalse(status, "There are 4 unsupported currencies");
     }
 }
