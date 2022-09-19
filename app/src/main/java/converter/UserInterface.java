@@ -1,6 +1,7 @@
 package converter;
 
 import java.io.InvalidClassException;
+import java.time.LocalDate;
 import java.util.Currency;
 import java.util.Scanner;
 
@@ -299,6 +300,28 @@ public class UserInterface {
         return true;
     }
 
+    public static boolean getSummary(User user) {
+
+        System.out.println("You are now in the process of getting a summary of exchanges rates for specific duration...");
+
+        int startYear = getInt("Please enter the year of the start date: (yyyy)");
+        int startMonth = getInt("Please enter the month of the start date: (mm)");
+        int startDay = getInt("Please enter the day of the start date in number: (dd)");
+
+        LocalDate startDate = LocalDate.of(startYear, startMonth, startDay);
+
+        int endYear = getInt("Please enter the year of the end date: (yyyy)");
+        int endMonth = getInt("Please enter the month of the end date: (mm)");
+        int endDay = getInt("Please enter the day of the end date: (dd)");
+
+        LocalDate endDate = LocalDate.of(endYear, endMonth, endDay);
+
+        Currency to = getCurrency("Please enter the target currency:");
+        Currency from = getCurrency("Please enter the base currency:");
+
+        return user.getSummary(startDate, endDate, from, to);
+    }
+
     public static int mainMenu() {
         return displayMenu(
             "Main menu",
@@ -307,6 +330,7 @@ public class UserInterface {
                 "Display excchange rates of most popular currencies",
                 "Maintain popular currencies",
                 "Maintain exchange rates",
+                "Get Summary of exchange rates in a certain duration",
                 "Log Out and Exit"
             },
             "Please enter the index of your option:");
