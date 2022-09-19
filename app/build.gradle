@@ -9,6 +9,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id 'jacoco'
 }
 
 repositories {
@@ -30,9 +31,17 @@ application {
     mainClass = 'converter.Exchange'
 }
 
+jacocoTestReport { 
+    reports { 
+        html.enabled = true 
+        csv.enabled = true 
+    }
+}
+
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+    test.finalizedBy jacocoTestReport
 }
 
 run {
