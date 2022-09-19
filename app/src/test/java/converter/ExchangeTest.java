@@ -178,4 +178,14 @@ class ExchangeTest {
 
         assertNotNull(market.getDatabase(), "The database is loaded");
     }
+
+    @Test
+    void getDatabasePath() {
+        
+        String path = "src/test/resources/config_correct.json";
+
+        assertTrue(
+            market.getDATABASE_PATH().equals(path), "The database path is incorrect"
+        );
+    }
 }
