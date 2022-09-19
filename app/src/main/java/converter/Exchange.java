@@ -114,7 +114,7 @@ public class Exchange {
         return rate;
     }
     
-    private Currency loadCurrency(JSONObject currency) {
+    public Currency loadCurrency(JSONObject currency) {
 
         String currencyCode = (String)currency.get("currency");
         return Currency.getInstance(currencyCode);
@@ -142,7 +142,7 @@ public class Exchange {
         return database;
     }
 
-    private JSONObject getCurrencyObject(Currency target) {
+    public JSONObject getCurrencyObject(Currency target) {
 
         for (int i = 0; i < this.database.size(); i++) {
             JSONObject currencyObject = (JSONObject)database.get(i);
@@ -173,7 +173,7 @@ public class Exchange {
         return (JSONArray)currencyObj.get("rates");
     }
 
-    private JSONArray getHistory(JSONObject currencyObj) {
+    public JSONArray getHistory(JSONObject currencyObj) {
         return (JSONArray)currencyObj.get("rates");
     }
 
@@ -223,7 +223,18 @@ public class Exchange {
             }
         }
 
+        System.err.println(
+            String.format("%s is not supported.",
+            currency.toString()));
         return false;
+    }
+
+    public String getDATABASE_PATH() {
+        return DATABASE_PATH;
+    }
+
+    public JSONArray getDatabase() {
+        return database;
     }
 
     public static void main(String[] args) {
@@ -233,6 +244,12 @@ public class Exchange {
 
         // Welcome message
         Exchange market = new Exchange("src/main/resources/config.json", ATTEMPTS_ALLOWED);
+
+        // load database
+        if (!market.refreshDatabase()) {
+            return;
+        }
+
         UserInterface.welcome();
 
         // User login
@@ -256,6 +273,37 @@ public class Exchange {
         if (user == null) {
             UserInterface.terminate();
             return;
+        }
+
+        // main menu
+        while (true) {
+            option = 0;
+            option = UserInterface.mainMenu();
+            switch (option) {
+                case 1:
+                    UserInterface.convert(user);
+                    break;
+
+                case 2:
+                    user.display();
+                    break;
+                
+                case 3:
+                    if (!UserInterface.setPopularCurrencies(user)) {
+                        System.out.println("Back to main menu...");
+                    }
+                    break;
+
+                case 4:
+                    if (!UserInterface.updateRates(user)) {
+                        System.out.println("Back to main menu...");
+                    }
+                    break;
+            
+                default:
+                    UserInterface.terminate();
+                    return;
+            }
         }
     }
 }

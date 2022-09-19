@@ -27,8 +27,9 @@ class ExchangeTest {
 
         String admin = "admin";
         market.createUser(1, admin);
-        assertNotNull(
-            market.getUsers(),
+        assertEquals(
+            1,
+            market.getUsers().size(),
             "There should be something in the user list");
         assertEquals(
             Admin.class,
@@ -41,8 +42,9 @@ class ExchangeTest {
 
         String normalUser = "Normal User";
         market.createUser(2, normalUser);
-        assertNotNull(
-            market.getUsers(),
+        assertEquals(
+            1,
+            market.getUsers().size(),
             "There should be something in the user list");
         assertEquals(
             NormalUser.class,
@@ -86,20 +88,27 @@ class ExchangeTest {
         // test whether the database is correctly loaded
         assertTrue(
             market.refreshDatabase(),
-            "The database should be able to be loaded");
+            "The database should be able to be loaded"
+        );
+        assertNotNull(
+            market.getDatabase(),
+            "The database should be able to be loaded"
+        );
         
         // test currency collection
-        assertNotNull(
-            market.getCurrencies(),
+        assertNotEquals(
+            0,
+            market.getCurrencies().size(),
             "There should be contents in the currency collection");
         assertEquals(
             numberOfCurrencies,
             market.getCurrencies().size(),
             "There should be 6 currencies loaded in the system");
         
-        // test rates collection
-        assertNotNull(
-            market.getLatestRates(),
+        // test lastest rates collection
+        assertNotEquals(
+            0,
+            market.getLatestRates().size(),
             "There should be some contents in the exchange rates collection");
         assertEquals(
             numberOfCurrencies,
@@ -154,5 +163,29 @@ class ExchangeTest {
 
         assertFalse(
             market.validateCurrency(currency), "Currency " + currency.toString() + " does not exists in the database");
+    }
+
+    @Test
+    void getDatabaseNoContent() {
+
+        assertNull(market.getDatabase(), "The database is not loaded");
+    }
+
+    @Test
+    void getDatabase() {
+
+        market.refreshDatabase();
+
+        assertNotNull(market.getDatabase(), "The database is loaded");
+    }
+
+    @Test
+    void getDatabasePath() {
+        
+        String path = "src/test/resources/config_correct.json";
+
+        assertTrue(
+            market.getDATABASE_PATH().equals(path), "The database path is incorrect"
+        );
     }
 }

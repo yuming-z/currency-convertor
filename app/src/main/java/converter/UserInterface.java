@@ -1,10 +1,12 @@
 package converter;
 
+import java.io.InvalidClassException;
 import java.util.Currency;
 import java.util.Scanner;
 
 public class UserInterface {
 
+    @SuppressWarnings("all")
     private static String getString(String instruction) {
 
         String response;
@@ -181,32 +183,35 @@ public class UserInterface {
         return null;
     }
 
+    private static Currency getCurrency(String instruction) {
+
+        String currencyCode;
+        Currency currency;
+
+        while (true) {
+
+            try {
+                
+                // get the currency code
+                currencyCode = getString(instruction);
+                currency = Currency.getInstance(currencyCode.toUpperCase());
+
+                return currency;
+
+            } catch (IllegalArgumentException e) {
+                System.err.println("The currency code you entered is not a valid ISO 4217 currency code.");
+                System.out.println("Please try again.");
+            }
+        }
+    }
+
     public static boolean convert(User user) {
 
-        // Retrieve information from stdin
-        String toCurrencyCode;
-        Currency toCurrency;
-        double amount = 0.00;
-        String fromCurrencyCode;
-        Currency fromCurrency;
-
-        try {
-            // get the currency to be converted to
-            toCurrencyCode = getString(
-                "Enter the currency code of the desired currency you want to convert to:");
-            toCurrency = Currency.getInstance(toCurrencyCode.toUpperCase());
-
-            // get the amount
-            amount = getDouble("Enter the amount:");
-
-            // Get current currency
-            fromCurrencyCode = getString("Enter the currency code of your current currency:");
-            fromCurrency = Currency.getInstance(fromCurrencyCode.toUpperCase());
-            
-        } catch (IllegalArgumentException e) {
-            System.err.println("The currency code you entered is not a valid ISO 4217 currency code.");
-            return false;
-        }
+        Currency toCurrency = getCurrency(
+            "Enter the currency code of the desired currency you want to convert to:"
+        );
+        double amount = getDouble("Enter the amount:");
+        Currency fromCurrency = getCurrency("Enter the currency code of your current currency:");
 
         double result = user.convert(amount, toCurrency, fromCurrency);
 
@@ -222,5 +227,88 @@ public class UserInterface {
                 result));
             return true;
         }
+    }
+    
+    public static double getNewRate(Currency from, Currency to) {
+
+        double rate = getDouble(String.format(
+            "Please enter the new rate from %s to %s:",
+            from.toString(),
+            to.toString()));
+
+        while (rate < 0) {
+            System.err.println("The new rate cannot be negative.");
+            System.out.println("Please try again.");
+            
+            rate = getDouble(String.format(
+                "Please enter the new rate from %s to %s:",
+                from.toString(),
+                to.toString()));
+        }
+
+        return rate;
+    }
+
+    public static boolean updateRates(User user) {
+        
+        try {
+            if (!user.updateRates()) {
+                System.err.println(
+                    "The update on exchange rates is unfinished.");
+                System.out.println(
+                    "Your entries during the process will be discarded.");
+                return false;
+            }
+        } catch (InvalidClassException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    private static Currency[] setPopularCurrencies() {
+
+        Currency[] currencies = new Currency[4];
+
+        for (int i = 0; i < currencies.length; i++) {
+            currencies[i] = getCurrency(
+                String.format(
+                    "Please enter the most popular currency %d:",
+                    i + 1)
+            );
+        }
+
+        return currencies;
+    }
+
+    public static boolean setPopularCurrencies(User user) {
+
+        try {
+            Currency[] currencies = setPopularCurrencies();
+
+            if (!user.setPopularCurrencies(currencies)) {
+                System.err.println("Setting popular currencies is unsuccessful.");
+                return false;
+            };
+        } catch (InvalidClassException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    public static int mainMenu() {
+        return displayMenu(
+            "Main menu",
+            new String[]{
+                "Convert money",
+                "Display excchange rates of most popular currencies",
+                "Maintain popular currencies",
+                "Maintain exchange rates",
+                "Log Out and Exit"
+            },
+            "Please enter the index of your option:");
     }
 }
