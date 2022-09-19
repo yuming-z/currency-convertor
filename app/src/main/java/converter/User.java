@@ -136,4 +136,6 @@ public abstract class User {
     }
 
     public abstract boolean updateRates() throws InvalidClassException;
+
+    public abstract boolean addCurrency(Currency newCurrency) throws InvalidClassException;
 }

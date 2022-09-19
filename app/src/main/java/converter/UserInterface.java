@@ -299,6 +299,29 @@ public class UserInterface {
         return true;
     }
 
+    public static boolean addCurrency(User user) {
+
+        Currency newCurrency = getCurrency(
+            "Please enter the currency code of the new currency type you want to add:"
+        );
+
+        try {
+
+            if (!user.addCurrency(newCurrency)) {
+                System.err.println(
+                    "The process of adding a new currency type is unsuccessful."
+                );
+                return false;
+            }
+            
+        } catch (InvalidClassException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
     public static int mainMenu() {
         return displayMenu(
             "Main menu",
@@ -307,6 +330,7 @@ public class UserInterface {
                 "Display excchange rates of most popular currencies",
                 "Maintain popular currencies",
                 "Maintain exchange rates",
+                "Add new currency type",
                 "Log Out and Exit"
             },
             "Please enter the index of your option:");
