@@ -106,6 +106,13 @@ public class Exchange {
             }
 
             String key = target.toString();
+
+            // for previous loading only
+            // if null -> ignore
+            if (jsonObject.get(key) == null) {
+                continue;
+            }
+
             double value = Double.parseDouble(jsonObject.get(key).toString());
 
             rate.put(target, value);
@@ -302,6 +309,12 @@ public class Exchange {
 
                 case 5:
                     if (!UserInterface.getSummary(user)) {
+                        System.out.println("Back to main menu...");
+                    }
+                    break;
+                
+                case 6:
+                    if (!UserInterface.addCurrency(user)) {
                         System.out.println("Back to main menu...");
                     }
                     break;

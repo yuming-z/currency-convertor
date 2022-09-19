@@ -318,4 +318,5 @@ public abstract class User {
         );
         return true;
     }
+    public abstract boolean addCurrency(Currency newCurrency) throws InvalidClassException;
 }
