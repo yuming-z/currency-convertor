@@ -1,22 +1,10 @@
 package converter;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Scanner;
-
 import java.util.*;
+
 public class UserInterface {
 
-
-
-    public static String getString(String instruction) {
+    private static String getString(String instruction) {
 
         String response;
         Scanner scan = new Scanner(System.in);
@@ -25,7 +13,7 @@ public class UserInterface {
             System.out.println(instruction);
 
             response = scan.nextLine();
-            
+
             // if no response is entered
             if ("".equals(response)) {
                 System.err.println("Blank entry is not allowed.");
@@ -34,14 +22,16 @@ public class UserInterface {
 
         } while (response == null);
 
+        scan.close();
+
         return response;
     }
 
-    public static int getInt(String instruction) {
+    private static int getInt(String instruction) {
         int response = 0;
 
         while (true) {
-            
+
             try {
                 response = Integer.parseInt(getString(instruction));
                 return response;
@@ -49,12 +39,48 @@ public class UserInterface {
             } catch (NumberFormatException e) {
                 System.err.println("Invalid entry - Number required");
             }
-
-            System.out.println(instruction);
         }
     }
-    
-    public static int displayMenu(String description, String[] options, String instruction) {
+
+    public static double getDouble(String instruction) {
+
+        double response = 0.00;
+
+        while (true) {
+
+            try {
+                response = Double.parseDouble(getString(instruction));
+                return response;
+
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid input - decimal number required");
+            }
+        }
+    }
+
+    private static boolean getBoolean(String instruction) {
+
+        instruction = instruction + " (y/n)";
+
+        String responseString;
+
+        while (true) {
+
+            responseString = getString(instruction);
+
+            if (responseString.toLowerCase().equals("y")) {
+                return true;
+            }
+            else if (responseString.toLowerCase().equals("n")) {
+                return false;
+            }
+            else {
+                System.err.println("Invalid input - must enter y or n");
+            }
+        }
+    }
+
+    private static int displayMenu(String description, String[] options, String instruction) {
         int selection = 0;
 
         // Display the menu
@@ -78,196 +104,131 @@ public class UserInterface {
         return selection;
     }
 
+    public static void welcome() {
+        System.out.println("Welcome to use the currency converter.");
+    }
 
-    public static boolean nameAndPass(String username, String password, Exchange exchange) {
+    public static void terminate() {
+        System.out.println("System terminating...");
+    }
 
-        Map<String, String> login = exchange.getLogin();
-        if(login.containsKey(username)) {
-            if (login.get(username) == password) {
-                return true;
+    public static int loginMenu() {
+        return displayMenu(
+                "You need to have a user account to use the converter.",
+                new String[]{"Register", "Log in"},
+                "Please enter the number of your option:");
+    }
+
+    public static int userDo(String[] actions) {
+        return displayMenu(
+                "Welcome!",
+                actions,
+                "Please enter the number of your option:");
+    }
+
+    private static int userTypeMenu() {
+        return displayMenu(
+                "There are two user types available:",
+                new String[]{"Admin", "Normal User"},
+                "Please enter the user type most appropriate to you:");
+    }
+
+    private static String setUsername() {
+
+        String username;
+
+        do {
+
+            username = getString("Please enter your username:");
+            System.out.println("Your username is: " + username);
+
+        } while (!getBoolean("Are you satisfied with your username?"));
+
+        return username;
+    }
+
+    public static void createUser(Exchange market) {
+
+        int accountType = userTypeMenu();
+        String username = setUsername();
+        market.createUser(accountType, username);
+
+        System.out.println("Back to main menu...");
+    }
+
+    private static String getUsername() {
+        return getString("Enter your username:");
+    }
+
+    public static User getUser(Exchange market) {
+
+        String username;
+        User user;
+
+        for (int i = market.getATTEMPTS(); i > 0; i--) {
+
+            username = getUsername();
+            user = market.getUser(username);
+
+            if (user != null) {
+                System.out.println("You are successfully logged in as: " + username);
+                return user;
+            }
+
+            System.err.println("Wrong username! Please try again.");
+
+            if (i - 1 != 1) {
+                System.out.println(String.format("You have %d attempts left.", i - 1));
+            }
+            else {
+                System.out.println(String.format("You have %d attempt left.", i - 1));
             }
         }
-        return false;
-    }
-    public static boolean parseString(String path) {
 
-        JSONParser parser = new JSONParser();
+        System.err.println("You failed too many times!");
+        return null;
+    }
+
+    public static boolean convert(User user) {
+
+        // Retrieve information from stdin
+        String toCurrencyCode;
+        Currency toCurrency;
+        double amount = 0.00;
+        String fromCurrencyCode;
+        Currency fromCurrency;
+
         try {
-            Object object = parser.parse(new FileReader(path));
+            // get the currency to be converted to
+            toCurrencyCode = getString(
+                    "Enter the currency code of the desired currency you want to convert to:");
+            toCurrency = Currency.getInstance(toCurrencyCode.toUpperCase());
 
-            JSONObject jsonObject = (JSONObject) object;
+            // get the amount
+            amount = getDouble("Enter the amount:");
 
-            JSONObject rates = (JSONObject) jsonObject.get("rates");
+            // Get current currency
+            fromCurrencyCode = getString("Enter the currency code of your current currency:");
+            fromCurrency = Currency.getInstance(fromCurrencyCode.toUpperCase());
 
-            String date = (String) rates.get("date");
-
-            JSONArray rate = (JSONArray) rates.get("rate");
-
-            for (Object r : rate) {
-                JSONObject thisRate = (JSONObject) r;
-
-            }
-            return true;
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-
-    public static boolean whichUser(Exchange exchange, AdminUser adminUser, NormalUser normalUser) {
-
-        Scanner scan = new Scanner(System.in);
-        while (scan.hasNext()) {
-            System.out.println("Hi How Are You, Welcome to the Exchange :)");
-            System.out.println("Are you an admin user or normal user? 1 for admin 2 for normal(1/2)");
-            String typeOfuser = scan.next();
-            if (typeOfuser == "1") {
-                System.out.println("what is your username");
-                String username = scan.next();
-                if (exchange.getLogin().containsKey(username)) {
-                    System.out.println("what is your password");
-                    String password = scan.next();
-                    if (nameAndPass(username, password, exchange)) {
-//                        boolean worked = false;
-//                        while (worked == false) {
-                            String choice = chooseForAdmin(exchange);
-                            while (choice == null){
-                                 choice = chooseForAdmin(exchange);
-                            }
-                            boolean worked = selectChoicesAdmin(choice, exchange, adminUser);
-                        //}
-                    }
-
-                }
-                return true;
-            } else if (typeOfuser == "2") {
-                boolean worked = false;
-                while (!worked ) {
-                    String choice = chooseForUser(exchange);
-                    while(choice == null){
-                        choice = chooseForUser(exchange);
-                    }
-                    worked = selectChoicesNormal(choice, exchange,normalUser);
-
-            }
+        } catch (IllegalArgumentException e) {
+            System.err.println("The currency code you entered is not a valid ISO 4217 currency code.");
+            return false;
         }
 
-        return false;
-    }
+        double result = user.convert(amount, toCurrency, fromCurrency);
 
-    public static  boolean selectChoicesNormal(String choice, Exchange exchange, NormalUser normalUser){
-            if (choice == "1"){
-                normalUser.displayTable(exchange);
-                return true;
-            }
-            else if(choice == "2"){
-                choiceIsTwo(exchange);
-                return true;
-            }
+        if (result == -1) {
+            return false;
         }
-
-
-
-    public static boolean  selectChoicesAdmin(String choice, Exchange exchange, AdminUser adminUser){
-        if (choice == "1"){
-            adminUser.displayTable(exchange);
+        else {
+            System.out.println(
+                    String.format("To get %s%.2f you need %s%.2f",
+                            toCurrency.getSymbol(),
+                            amount,
+                            fromCurrency.getSymbol(),
+                            result));
             return true;
         }
-        else if(choice == "2"){
-            choiceIsTwo(exchange);
-            return true;
-        }
-        else if(choice == "4"){
-            adminUser.choiceIsFour(exchange);
-            return true;
-        }
-        else if(choice =="5"){
-            adminUser.choiceIsFive(exchange);
-            return true;
-        }
-        System.out.println("something went wrong try again. (choose from the selected numbers");
-        return false;
-
-
     }
-
-    public static String chooseForAdmin(Exchange exchange) {
-
-        Scanner scan = new Scanner(System.in);
-        while (scan.hasNext()) {
-            System.out.println("which step do you want to take (choose the number) :");
-            System.out.println("1:display table of exchange rates");
-            System.out.println("2:convert currency of amount");
-            System.out.println("3:add currency");
-            System.out.println("4:change rate to latest daily");
-            System.out.println("5:see statistics");
-            String choice = scan.nextLine();
-            return choice;
-        }
-
-        return null;
-    }
-
-    public static String chooseForUser(Exchange exchange){
-
-        Scanner scan = new Scanner(System.in);
-        while (scan.hasNext()) {
-            System.out.println("which step do you want to take (choose the number) :");
-            System.out.println("1:display table of exchange rates");
-            System.out.println("2:convert currency of amount");
-            String choice = scan.nextLine();
-            return choice;
-        }
-
-
-        return null;
-
-    }
-
-
-
-
-
-
-
-    public static boolean choiceIsOne(Exchange exchange) {
-            displayTable(exchange);
-            return true;
-    }
-
-    public static boolean choiceIsTwo(Exchange exchange) {
-        Scanner scan = new Scanner(System.in);
-        while (scan.hasNext()) {
-            System.out.println("what amount");
-            String amount = scan.next();
-            System.out.println("from what currency");
-            String oldSymbol = scan.next();
-            System.out.println("to what currency");
-            String newSymbol = scan.next();
-            double amountTochange = Double.parseDouble(amount);
-            convertCurrency(amountTochange, oldSymbol, newSymbol, exchange);
-            return true;
-        }
-
-        return false;
-    }
-
-
-
-
-
-
-
-
-
-
-
 }
-
