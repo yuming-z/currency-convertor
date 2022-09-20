@@ -155,6 +155,50 @@ class ExchangeTest {
     }
 
     @Test
+    void testDatabaseMultipleRatesExtraCurrency() {
+
+        market = new Exchange(pathPrefix + "config_multiple_extra.json", 3);
+
+        boolean status = market.refreshDatabase();
+
+        assertTrue(status, "The database should be able to be loaded");
+
+        assertEquals(
+            6,
+            market.getCurrencies().size(),
+            "It should have the same number after the new currency has been added"
+        );
+
+        assertEquals(
+            6,
+            market.getLatestRates().size(),
+            "It should have the same number after the new currency has been added"
+        );
+
+        for (Currency currency: market.getLatestRates().keySet()) {
+            assertEquals(
+                6 - 1,
+                market.getLatestRates().get(currency).size(),
+                "It should have 5 rates related to 1 currency type in latest rates"
+            );
+        }
+
+        assertEquals(
+            6 - 1,
+            market.getPreviousRates().size(),
+            "It should have the same number before the new currency has been added"
+        );
+
+        for (Currency currency: market.getPreviousRates().keySet()) {
+            assertEquals(
+                6 - 2,
+                market.getPreviousRates().get(currency).size(),
+                "It should have 4 rates related to 1 currency type in previous rates"
+            );
+        }
+    }
+
+    @Test
     void testValidCurrency() {
 
         // load database
