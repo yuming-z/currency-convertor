@@ -474,13 +474,13 @@ public class UserInterface {
             "Main menu",
             new String[]{
                 "Convert money",
-                "Display excchange rates of most popular currencies",
+                "Display exchange rates of most popular currencies",
                 "Maintain popular currencies",
                 "Maintain exchange rates",
                 "Get Summary of exchange rates in a certain duration",
                 "Add new currency type",
                 "Log Out and Exit"
             },
-            "Please enter the index of your option:");
+            "Please enter the index of your option: (Maintain the popular currencies before you display them)");
     }
 }
