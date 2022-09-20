@@ -44,18 +44,14 @@ public class Exchange {
         switch (accountType) {
             case 1:
                 user = new Admin(this, username);
+                this.users.add(user);
                 break;
 
             case 2:
                 user = new NormalUser(this, username);
+                this.users.add(user);
                 break;
-        
-            default:
-                user = new NormalUser(this, username);
-                break;
-        }
-
-        this.users.add(user);
+        }    
     }
 
     public List<User> getUsers() {
