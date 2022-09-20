@@ -5,16 +5,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.PrintStream;
+import java.io.InvalidClassException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class UserTest {
     String path = "src/test/resources/config_correct.json";
     Exchange market = new Exchange(path, 0);
-    User user = new NormalUser(market, "test user");
+    User user = new Admin(market, "test user");
 
     @Test
     void testInvalidMarketConvert() {
@@ -61,6 +60,41 @@ public class UserTest {
         String[] actualLines = baos.toString().split(System.lineSeparator());
 
         assertTrue(success2, "Get Summary did not return true");
+        assertEquals(actualLines.length, expectedLines.length);
+        
+        for (int i = 0; i < actualLines.length; i++) {
+            assertEquals(actualLines[i], expectedLines[i], String.format("Line %d is incorrect", i));
+        }
+    }
+
+    @Test
+    void testDisplay() {
+        String[] expectedLines = {"From/To\tAUD\tSGD\tUSD\tEUR", "AUD\t1.00\t1.06\t1.49\t1.48", "SGD\t0.95\t1.00\t1.41\t1.40", "USD\t0.67\t0.71\t1.00\t1.00", "EUR\t0.68\t0.71\t1.00\t1.00"};
+
+        Currency[] currencies = new Currency[]{
+            Currency.getInstance("AUD"),
+            Currency.getInstance("SGD"),
+            Currency.getInstance("USD"),
+            Currency.getInstance("EUR")
+        };
+
+        Boolean gotCurrencies = false;
+        try {
+            gotCurrencies = user.setPopularCurrencies(currencies);
+
+        } catch (InvalidClassException e) {
+            e.printStackTrace();
+        }
+        assertTrue(gotCurrencies, "Unit test cannot run without popular currencies set");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(baos);
+        System.setOut(printStream);
+
+        Boolean success = user.display();
+        String[] actualLines = baos.toString().split(System.lineSeparator());
+
+        assertTrue(success, "Did not display");
         assertEquals(actualLines.length, expectedLines.length);
         
         for (int i = 0; i < actualLines.length; i++) {
