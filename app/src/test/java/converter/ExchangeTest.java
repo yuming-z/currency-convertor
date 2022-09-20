@@ -133,6 +133,28 @@ class ExchangeTest {
     }
 
     @Test
+    void testDatabaseMultipleRates() {
+
+        market = new Exchange(pathPrefix + "config_multiple.json", 3);
+
+        market.refreshDatabase();
+
+        assertEquals(
+            6,
+            market.getPreviousRates().size(),
+            "There should be 6 currencies inside the hashMap for previous exchange rates"
+        );
+
+        for (Currency currency: market.getPreviousRates().keySet()) {
+            assertEquals(
+                6 - 1,
+                market.getPreviousRates().get(currency).size(),
+                "There should be 5 exchange rates related to each currency type"
+            );
+        }
+    }
+
+    @Test
     void testValidCurrency() {
 
         // load database
