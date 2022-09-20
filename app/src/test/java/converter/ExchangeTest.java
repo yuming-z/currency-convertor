@@ -133,13 +133,69 @@ class ExchangeTest {
     }
 
     @Test
-    void testCurrencyValidationNoCurrency() {
-        
-        Currency currency = Currency.getInstance("AUD");
+    void testDatabaseMultipleRates() {
 
-        assertFalse(
-            market.validateCurrency(currency),
-            "There is no currency in the system");
+        market = new Exchange(pathPrefix + "config_multiple.json", 3);
+
+        market.refreshDatabase();
+
+        assertEquals(
+            6,
+            market.getPreviousRates().size(),
+            "There should be 6 currencies inside the hashMap for previous exchange rates"
+        );
+
+        for (Currency currency: market.getPreviousRates().keySet()) {
+            assertEquals(
+                6 - 1,
+                market.getPreviousRates().get(currency).size(),
+                "There should be 5 exchange rates related to each currency type"
+            );
+        }
+    }
+
+    @Test
+    void testDatabaseMultipleRatesExtraCurrency() {
+
+        market = new Exchange(pathPrefix + "config_multiple_extra.json", 3);
+
+        boolean status = market.refreshDatabase();
+
+        assertTrue(status, "The database should be able to be loaded");
+
+        assertEquals(
+            6,
+            market.getCurrencies().size(),
+            "It should have the same number after the new currency has been added"
+        );
+
+        assertEquals(
+            6,
+            market.getLatestRates().size(),
+            "It should have the same number after the new currency has been added"
+        );
+
+        for (Currency currency: market.getLatestRates().keySet()) {
+            assertEquals(
+                6 - 1,
+                market.getLatestRates().get(currency).size(),
+                "It should have 5 rates related to 1 currency type in latest rates"
+            );
+        }
+
+        assertEquals(
+            6 - 1,
+            market.getPreviousRates().size(),
+            "It should have the same number before the new currency has been added"
+        );
+
+        for (Currency currency: market.getPreviousRates().keySet()) {
+            assertEquals(
+                6 - 2,
+                market.getPreviousRates().get(currency).size(),
+                "It should have 4 rates related to 1 currency type in previous rates"
+            );
+        }
     }
 
     @Test
@@ -166,13 +222,7 @@ class ExchangeTest {
     }
 
     @Test
-    void getDatabaseNoContent() {
-
-        assertNull(market.getDatabase(), "The database is not loaded");
-    }
-
-    @Test
-    void getDatabase() {
+    void testGetDatabase() {
 
         market.refreshDatabase();
 
@@ -180,12 +230,38 @@ class ExchangeTest {
     }
 
     @Test
-    void getDatabasePath() {
+    void testGetDatabasePath() {
         
         String path = "src/test/resources/config_correct.json";
 
         assertTrue(
             market.getDATABASE_PATH().equals(path), "The database path is incorrect"
+        );
+    }
+
+    @Test
+    void testGetHistoryInvalidCurrency() {
+
+        market.refreshDatabase();
+
+        Currency currency = Currency.getInstance("NZD");
+
+        assertNull(
+            market.getHistory(currency),
+            String.format("%s is not supported in the exchange database", currency.toString())  
+        );
+    }
+
+    @Test
+    void testGetHistoryValidCurrency() {
+
+        market.refreshDatabase();
+
+        Currency currency = Currency.getInstance("AUD");
+
+        assertNotNull(
+            market.getHistory(currency),
+            String.format("%s is supported in the exchange database", currency.toString())
         );
     }
 }

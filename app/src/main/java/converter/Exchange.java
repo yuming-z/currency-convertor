@@ -44,18 +44,14 @@ public class Exchange {
         switch (accountType) {
             case 1:
                 user = new Admin(this, username);
+                this.users.add(user);
                 break;
 
             case 2:
                 user = new NormalUser(this, username);
+                this.users.add(user);
                 break;
-        
-            default:
-                user = new NormalUser(this, username);
-                break;
-        }
-
-        this.users.add(user);
+        }    
     }
 
     public List<User> getUsers() {
@@ -149,7 +145,7 @@ public class Exchange {
         return database;
     }
 
-    public JSONObject getCurrencyObject(Currency target) {
+    private JSONObject getCurrencyObject(Currency target) {
 
         for (int i = 0; i < this.database.size(); i++) {
             JSONObject currencyObject = (JSONObject)database.get(i);
