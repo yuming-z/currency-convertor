@@ -145,7 +145,7 @@ public class Exchange {
         return database;
     }
 
-    public JSONObject getCurrencyObject(Currency target) {
+    private JSONObject getCurrencyObject(Currency target) {
 
         for (int i = 0; i < this.database.size(); i++) {
             JSONObject currencyObject = (JSONObject)database.get(i);

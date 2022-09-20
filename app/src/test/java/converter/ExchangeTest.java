@@ -156,7 +156,7 @@ class ExchangeTest {
     }
 
     @Test
-    void getDatabase() {
+    void testGetDatabase() {
 
         market.refreshDatabase();
 
@@ -164,12 +164,38 @@ class ExchangeTest {
     }
 
     @Test
-    void getDatabasePath() {
+    void testGetDatabasePath() {
         
         String path = "src/test/resources/config_correct.json";
 
         assertTrue(
             market.getDATABASE_PATH().equals(path), "The database path is incorrect"
+        );
+    }
+
+    @Test
+    void testGetHistoryInvalidCurrency() {
+
+        market.refreshDatabase();
+
+        Currency currency = Currency.getInstance("NZD");
+
+        assertNull(
+            market.getHistory(currency),
+            String.format("%s is not supported in the exchange database", currency.toString())  
+        );
+    }
+
+    @Test
+    void testGetHistoryValidCurrency() {
+
+        market.refreshDatabase();
+
+        Currency currency = Currency.getInstance("AUD");
+
+        assertNotNull(
+            market.getHistory(currency),
+            String.format("%s is supported in the exchange database", currency.toString())
         );
     }
 }
