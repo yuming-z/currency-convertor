@@ -133,16 +133,6 @@ class ExchangeTest {
     }
 
     @Test
-    void testCurrencyValidationNoCurrency() {
-        
-        Currency currency = Currency.getInstance("AUD");
-
-        assertFalse(
-            market.validateCurrency(currency),
-            "There is no currency in the system");
-    }
-
-    @Test
     void testValidCurrency() {
 
         // load database
