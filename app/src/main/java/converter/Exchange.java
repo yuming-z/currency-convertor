@@ -244,6 +244,10 @@ public class Exchange {
         return database;
     }
 
+    public boolean validateAdmin(User user) {
+        return user.getClass().equals(Admin.class);
+    }
+
     public static void main(String[] args) {
      
         int option;
@@ -302,9 +306,20 @@ public class Exchange {
                     break;
 
                 case 4:
-                    if (!UserInterface.updateRates(user)) {
-                        System.out.println("Back to main menu...");
+                    if (market.validateAdmin(user)) {
+
+                        if (!UserInterface.updateRates(user)) {
+                            System.err.println("The process of updating new exchange rates is unsuccessful.");
+                            System.out.println("Your entry during the process will be discarded.");
+                        }
+                        else {
+                            break;
+                        }
                     }
+                    else {
+                        System.err.println("Unauthorised");
+                    }
+                    System.out.println("Back to main menu...");
                     break;
 
                 case 5:
@@ -314,9 +329,20 @@ public class Exchange {
                     break;
                 
                 case 6:
-                    if (!UserInterface.addCurrency(user)) {
-                        System.out.println("Back to main menu...");
+                    if (market.validateAdmin(user)) {
+
+                        if (!UserInterface.addCurrency(user)) {
+                            System.err.println("The process of adding new currency is unsuccessful.");
+                            System.out.println("Your entry during the process will be discarded.");
+                        }
+                        else {
+                            break;
+                        }
                     }
+                    else {
+                        System.err.println("Unauthorised");
+                    }
+                    System.out.println("Back to main menu...");
                     break;
             
                 default:

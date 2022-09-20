@@ -14,14 +14,4 @@ public class NormalUser extends User {
             throws InvalidClassException {
         throw new InvalidClassException("Unauthorised");
     }
-
-    @Override
-    public boolean updateRates() throws InvalidClassException {
-        throw new InvalidClassException("Unauthorised");
-    }
-
-    @Override
-    public boolean addCurrency(Currency newCurrency) throws InvalidClassException {
-        throw new InvalidClassException("Unauthorised");
-    }
 }
