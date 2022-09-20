@@ -264,4 +264,22 @@ class ExchangeTest {
             String.format("%s is supported in the exchange database", currency.toString())
         );
     }
+
+    @Test
+    void testAdmin() {
+
+        assertTrue(
+            market.validateAdmin(new Admin(market, "Admin")),
+            "The provided user is an admin"
+        );
+    }
+
+    @Test
+    void testNormalUser() {
+
+        assertFalse(
+            market.validateAdmin(new NormalUser(market, "Normal user")),
+            "The provided user is a normal user"
+        );
+    }
 }

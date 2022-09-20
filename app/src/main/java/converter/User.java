@@ -25,6 +25,10 @@ public abstract class User {
         return username;
     }
 
+    public Exchange getMarket() {
+        return market;
+    }
+
     public double convert(double amount, Currency to, Currency from) {
 
         if (!this.market.refreshDatabase()) {
@@ -141,8 +145,6 @@ public abstract class User {
         this.displayPopularRates(latestRates, previousRates);
         return true;
     }
-
-    public abstract boolean updateRates() throws InvalidClassException;
 
     private int getRateIndex(LocalDate date, JSONArray history) {
 
@@ -318,5 +320,4 @@ public abstract class User {
         );
         return true;
     }
-    public abstract boolean addCurrency(Currency newCurrency) throws InvalidClassException;
 }

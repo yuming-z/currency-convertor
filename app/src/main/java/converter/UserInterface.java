@@ -1,9 +1,15 @@
 package converter;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InvalidClassException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Currency;
 import java.util.Scanner;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class UserInterface {
 
@@ -229,6 +235,48 @@ public class UserInterface {
             return true;
         }
     }
+
+    private static boolean writeFile(JSONArray database, String path) {
+
+        try {
+            FileWriter writer = new FileWriter(path);
+
+            writer.write(database.toJSONString());
+
+            // flush the writer ptr
+            writer.flush();
+
+            writer.close();
+
+            return true;
+
+        } catch (IOException e) {
+            System.err.println("The database file cannot be loaded.");
+            return false;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static JSONObject addRates(Currency to, Exchange market) {
+
+        // Create new JSONObject for new rates
+        JSONObject newRates = new JSONObject();
+
+        // Add the date
+        newRates.put("date", LocalDateTime.now().toString());
+
+        for (Currency from: market.getCurrencies()) {
+
+            if (to.equals(from)) {
+                continue;
+            }
+
+            double rate = UserInterface.getNewRate(from, to);
+            newRates.put(from.toString(), rate);
+        }
+
+        return newRates;
+    }
     
     public static double getNewRate(Currency from, Currency to) {
 
@@ -250,22 +298,34 @@ public class UserInterface {
         return rate;
     }
 
+    @SuppressWarnings("unchecked")
     public static boolean updateRates(User user) {
-        
-        try {
-            if (!user.updateRates()) {
-                System.err.println(
-                    "The update on exchange rates is unfinished.");
-                System.out.println(
-                    "Your entries during the process will be discarded.");
-                return false;
-            }
-        } catch (InvalidClassException e) {
-            System.err.println(e.getMessage());
-            return false;
+
+        System.out.println("Updating all exchange rates in the system...");
+
+        JSONArray database = user.getMarket().getDatabase();
+
+        for (int i = 0; i < database.size(); i++) {
+
+            // Get the JSONObject for the currency
+            JSONObject currencyObj = (JSONObject)database.get(i);
+
+            // Get the target currency
+            Currency to = user.getMarket().loadCurrency(currencyObj);
+
+            // Get the JSONArray rates
+            JSONArray rates = (JSONArray)currencyObj.get("rates");
+
+            // append a new element of JSONObject
+            // which stores the new rate
+            rates.add(addRates(to, user.getMarket()));
+
+            // Update the rates in currencyObj
+            currencyObj.put("currency", to.toString());
+            currencyObj.put("rates", rates);
         }
 
-        return true;
+        return writeFile(database, user.getMarket().getDATABASE_PATH());
     }
 
     private static Currency[] setPopularCurrencies() {
@@ -322,27 +382,91 @@ public class UserInterface {
         return user.getSummary(startDate, endDate, from, to);
     }
 
-    public static boolean addCurrency(User user) {
+    @SuppressWarnings("unchecked")
+    private static JSONObject copyRates(Currency to, JSONObject rates, Exchange market) {
 
-        Currency newCurrency = getCurrency(
-            "Please enter the currency code of the new currency type you want to add:"
-        );
+        // Create a new JSONObject for latest rates
+        JSONObject newRates = new JSONObject();
 
-        try {
+        // add the date
+        newRates.put("date", LocalDateTime.now().toString());
 
-            if (!user.addCurrency(newCurrency)) {
-                System.err.println(
-                    "The process of adding a new currency type is unsuccessful."
-                );
-                return false;
+        // copy the rates
+        for (Currency from: market.getCurrencies()) {
+
+            if (to.equals(from)) {
+                continue;
             }
-            
-        } catch (InvalidClassException e) {
-            System.err.println(e.getMessage());
-            return false;
+
+            newRates.put(
+                from.toString(),
+                rates.get(from.toString())
+            );
         }
 
-        return true;
+        return newRates;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static boolean addCurrency(User user) {
+
+        // Get the new currency
+        Currency newCurrency = getCurrency("Please enter the currency code of the new currency type you want to add:");
+
+        // Get the JSON database
+        JSONArray database = user.getMarket().getDatabase();
+
+        // update the rates for the existing currencies
+        for (int i = 0; i < database.size(); i++) {
+
+            // Get the JSONObject for the currency
+            JSONObject currencyObj = (JSONObject)database.get(i);
+
+            // Get the target currency
+            Currency to = user.getMarket().loadCurrency(currencyObj);
+
+            // Get the JSONArray rates
+            JSONArray rates = (JSONArray)currencyObj.get("rates");
+
+            // Create a new JSONObject for the latest rates
+            // Copy the existing newest rate
+            JSONObject newRates = copyRates(
+                to,
+                (JSONObject)rates.get(rates.size() - 1),
+                user.getMarket()
+            );
+
+            // add the exchange rate for the new currency
+            double rate = getNewRate(newCurrency, to);
+            newRates.put(newCurrency.toString(), rate);
+
+            // append the new rates as a new element
+            rates.add(newRates);
+
+            // update the rates in CurrencyObj
+            currencyObj.put("currency", to.toString());
+            currencyObj.put("rates", rates);
+        }
+
+        // Create a new JSONObject for new currency
+        JSONObject newCurrencyObj = new JSONObject();
+
+        // add the currency name to JSONObject
+        newCurrencyObj.put("currency", newCurrency.toString());
+
+        // Create a JSONArray to store rates
+        JSONArray rates = new JSONArray();
+
+        // add new entry of exchange rates
+        rates.add(addRates(newCurrency, user.getMarket()));
+
+        // Add the list of rates to JSONObject
+        newCurrencyObj.put("rates", rates);
+
+        // Append the new CurrencyObj to the database list
+        database.add(newCurrencyObj);
+
+        return writeFile(database, user.getMarket().getDATABASE_PATH());
     }
 
     public static int mainMenu() {
