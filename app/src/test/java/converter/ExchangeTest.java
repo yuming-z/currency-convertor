@@ -166,12 +166,6 @@ class ExchangeTest {
     }
 
     @Test
-    void getDatabaseNoContent() {
-
-        assertNull(market.getDatabase(), "The database is not loaded");
-    }
-
-    @Test
     void getDatabase() {
 
         market.refreshDatabase();
