@@ -4,13 +4,24 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.InvalidClassException;
+import java.io.*;
+import java.time.LocalDateTime;
 import java.util.Currency;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.junit.Assert.assertEquals;
+import java.lang.System.*;
+import java.io.ByteArrayInputStream;
+import static org.junit.Assert.*;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 class AdminTest {
     
     static final String PATH = "src/test/resources/config_correct.json";
     Exchange market = new Exchange(PATH, 0);
     User user = new Admin(market, "test user");
+
+    String date = LocalDateTime.now().toString();
 
     @Test
     void testValidConversion() {
@@ -182,5 +193,154 @@ class AdminTest {
         }
 
         assertFalse(status, "There are 4 unsupported currencies");
+    }
+
+    @Test
+    void testWriteFile(){
+        boolean actual = user.writeFile(PATH);
+        assertTrue(actual, "the file was not written on");
+
+    }
+
+
+    @Test
+    void testAddRates(){
+        String actual = String.format("0.97643",
+                System.lineSeparator(),
+                System.lineSeparator());
+        ByteArrayInputStream in = new ByteArrayInputStream(actual.getBytes());
+        System.setIn(in);
+
+        Currency to = Currency.getInstance("AUD");
+        Currency from = Currency.getInstance("CNY");
+        market.setCurrency(to);
+        market.setCurrency(from);
+        JSONObject addedRates = user.addRates(to);
+
+
+
+        String expected = "0.97643";
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(b);
+        System.setOut(printStream);
+
+        String[] lines = b.toString().split(System.lineSeparator());
+        String inputGot = lines[lines.length-1];
+
+
+        JSONObject actualUsed = new JSONObject();
+        actualUsed.put("date", LocalDateTime.now().toString());
+        actualUsed.put("CNY","0.97643");
+
+
+
+        JSONAssert.assertEquals(actualUsed, addedRates, true);
+
+    }
+
+    @Test
+    void testCopyRates(){
+        JSONObject json = new JSONObject();
+        json.put("AUD","0.97643");
+        Currency c = Currency.getInstance("AUD");
+        Currency from = Currency.getInstance("CNY");
+        this.market.setCurrency(from);
+        JSONObject  expected = copyRates(c, json);
+        JSONObject newRates = new JSONObject();
+        json.put("date",LocalDateTime.now().toString() );
+        json.put("CNY","0.97643");
+
+        JSONAssert.assertEquals(expected, newRates, true);
+
+
+    }
+
+    @Test
+    void testAddRatesFromNotExist(){
+        String actual = String.format("0.97643",
+                System.lineSeparator(),
+                System.lineSeparator());
+        ByteArrayInputStream in = new ByteArrayInputStream(actual.getBytes());
+        System.setIn(in);
+
+        Currency to = Currency.getInstance("AUD");
+        Currency from = Currency.getInstance("CNY");
+        market.setCurrency(to);
+        JSONObject addedRates = user.addRates(to);
+
+
+
+        String expected = "0.97643";
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(b);
+        System.setOut(printStream);
+
+        String[] lines = b.toString().split(System.lineSeparator());
+        String inputGot = lines[lines.length-1];
+
+
+        JSONObject actualUsed = new JSONObject();
+        actualUsed.put("date", LocalDateTime.now().toString());
+        actualUsed.put("CNY","0.97643");
+
+
+
+        JSONAssert.assertEquals(actualUsed, addedRates, false);
+
+
+
+    }
+
+    @Test
+    void testAddRatesDoesNotExist() {
+        String expected = String.format("",
+                System.lineSeparator(),
+                System.lineSeparator());
+        ByteArrayInputStream in = new ByteArrayInputStream(expected.getBytes());
+        System.setIn(in);
+
+        Currency to = Currency.getInstance("AUD");
+        Currency from = Currency.getInstance("CNY");
+        market.setCurrency(to);
+        market.setCurrency(from);
+        JSONObject addedRates = user.addRates(to);
+
+
+        String actual = "";
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(b);
+        System.setOut(printStream);
+
+        String[] lines = b.toString().split(System.lineSeparator());
+        String inputGot = lines[lines.length - 1];
+
+
+        JSONObject actualUsed = new JSONObject();
+        actualUsed.put("date", LocalDateTime.now().toString());
+        actualUsed.put("CNY","0.97643");
+
+
+
+        JSONAssert.assertEquals(actualUsed, addedRates, true);
+
+    }
+
+
+
+        @Test
+    void testIncorrectWriteFile(){
+        boolean actual = user.writeFile("src/test/resources/config_incorrect.json");
+        assertTrue(actual, "the file was written on");
+
+    }
+
+    @Test
+    void getDatabasePath() {
+
+        String path = "src/test/resources/config_correct.json";
+
+        assertTrue(
+                market.getDATABASE_PATH().equals(path), "The database path is incorrect"
+        );
     }
 }
