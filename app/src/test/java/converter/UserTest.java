@@ -92,7 +92,7 @@ public class UserTest {
         System.setOut(printStream);
 
         Boolean success = user.display();
-        String[] actualLines = baos.toString().split(System.lineSeparator());
+        String[] actualLines = baos.toString().split("\n");
 
         assertTrue(success, "Did not display");
         assertEquals(actualLines.length, expectedLines.length);
